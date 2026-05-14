@@ -45,9 +45,9 @@ checksum:
   name_template: "checksums.txt"
   algorithm: sha256
 
-signs:
-  - cmd: cosign
-    artifacts: checksum
+#signs:
+#  - cmd: cosign
+#    artifacts: checksum
     args:
       - "sign-blob"
       - "--yes"
