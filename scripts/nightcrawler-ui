@@ -1,0 +1,1052 @@
+#!/bin/bash
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Interactive UI Wrapper
+#  Author: 1607-NetEnginee / Cyberoutcast
+#
+#  Wrapper interaktif untuk nightcrawler v7.0 binary.
+#  Menyediakan wizard input, menu, dan laporan HTML interaktif.
+#
+#  Install:
+#    sudo cp nightcrawler-ui /usr/local/bin/nightcrawler-ui
+#    sudo chmod +x /usr/local/bin/nightcrawler-ui
+#    sudo nightcrawler-ui
+# ════════════════════════════════════════════════════════════════════
+set -o pipefail
+
+# ── GLOBALS ─────────────────────────────────────────────────────
+NC_BIN="${NC_BIN:-nightcrawler}"
+OUTPUT_DIR="${OUTPUT_DIR:-$HOME/nightcrawler-reports}"
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+OPERATOR_NAME=""
+INSTANSI_NAME=""
+TARGETS=()
+STEALTH_MODE="true"
+PROXY=""
+REPORT_DIR=""
+SCAN_LOG=""
+
+RISK_CRITICAL=0
+RISK_HIGH=0
+RISK_MEDIUM=0
+RISK_LOW=0
+RISK_INFO=0
+declare -a FINDINGS_DB=()
+
+# ── COLORS ──────────────────────────────────────────────────────
+RED='\033[0;31m'    GREEN='\033[0;32m'   YELLOW='\033[1;33m'
+BLUE='\033[0;34m'   CYAN='\033[0;36m'    MAGENTA='\033[0;35m'
+WHITE='\033[1;37m'  BOLD='\033[1m'       DIM='\033[2m'
+NC='\033[0m'
+
+# ── UI HELPERS ───────────────────────────────────────────────────
+ok()   { echo -e "  ${GREEN}[✓]${NC} $1"; }
+warn() { echo -e "  ${YELLOW}[!]${NC} $1"; }
+fail() { echo -e "  ${RED}[✗]${NC} $1"; }
+info() { echo -e "  ${CYAN}[i]${NC} $1"; }
+
+section() {
+    echo ""
+    echo -e "${GREEN}${BOLD}  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+    echo -e "${GREEN}${BOLD}  ┃  $1${NC}"
+    echo -e "${GREEN}${BOLD}  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+}
+
+matrix_rain() {
+    local cols; cols=$(tput cols 2>/dev/null || echo 80)
+    local chars="NIGHTCRAWLER01010101"
+    tput civis 2>/dev/null
+    for ((l=0; l<5; l++)); do
+        local line=""
+        for ((c=0; c<cols; c++)); do
+            [ $((RANDOM % 3)) -eq 0 ] && line+="\033[32m${chars:$((RANDOM % ${#chars})):1}" || line+=" "
+        done
+        echo -e "$line"; sleep 0.04
+    done
+    tput cnorm 2>/dev/null; sleep 0.1
+    echo -e "${NC}"
+}
+
+glitch_text() {
+    local text="$1" glitch_chars="@#\$%&!?*~^"
+    for ((pass=0; pass<2; pass++)); do
+        local glitched=""
+        for ((i=0; i<${#text}; i++)); do
+            [ $((RANDOM % 4)) -eq 0 ] && glitched+="${glitch_chars:$((RANDOM % ${#glitch_chars})):1}" || glitched+="${text:$i:1}"
+        done
+        printf "\r  ${GREEN}%s${NC}" "$glitched"; sleep 0.08
+    done
+    printf "\r  ${GREEN}${BOLD}%s${NC}\n" "$text"
+}
+
+spinner() {
+    local pid=$1 msg="${2:-Processing}" spin='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏' i=0
+    tput civis 2>/dev/null
+    while kill -0 "$pid" 2>/dev/null; do
+        printf "\r  ${CYAN}[%s]${NC} %s..." "${spin:i++%${#spin}:1}" "$msg"; sleep 0.1
+    done
+    printf "\r  ${GREEN}[✓]${NC} %-50s\n" "$msg"
+    tput cnorm 2>/dev/null
+}
+
+# ── BANNER ───────────────────────────────────────────────────────
+banner() {
+    clear; echo ""
+    echo -e "${GREEN}${BOLD}"
+    cat << 'BANNER'
+                     ╲  ╲ │ ╱  ╱
+                      ╲  ╲│╱  ╱
+                   ╺━━━[◉ ◉]━━━╸
+                      ╱  ╱│╲  ╲
+                     ╱  ╱ │ ╲  ╲
+
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  ███╗   ██╗██╗ ██████╗ ██╗  ██╗████████╗               ║
+  ║  ████╗  ██║██║██╔════╝ ██║  ██║╚══██╔══╝               ║
+  ║  ██╔██╗ ██║██║██║  ███╗███████║   ██║                   ║
+  ║  ██║╚██╗██║██║██║   ██║██╔══██║   ██║                   ║
+  ║  ██║ ╚████║██║╚██████╔╝██║  ██║   ██║                   ║
+  ║  ╚═╝  ╚═══╝╚═╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝                  ║
+  ║         ██████╗██████╗  █████╗ ██╗    ██╗██╗     ███████╗██████╗  ║
+  ║        ██╔════╝██╔══██╗██╔══██╗██║    ██║██║     ██╔════╝██╔══██╗ ║
+  ║        ██║     ██████╔╝███████║██║ █╗ ██║██║     █████╗  ██████╔╝ ║
+  ║        ██║     ██╔══██╗██╔══██║██║███╗██║██║     ██╔══╝  ██╔══██╗ ║
+  ║        ╚██████╗██║  ██║██║  ██║╚███╔███╔╝███████╗███████╗██║  ██║ ║
+  ║         ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚══╝╚══╝╚══════╝╚══════╝╚═╝  ╚═╝║
+  ╚═══════════════════════════════════════════════════════════╝
+BANNER
+    echo -e "${NC}"
+    echo -e "    ${DIM}v7.0 | Offensive Security Framework | by 1607-NetEnginee / Cyberoutcast${NC}"
+    echo ""
+    [ -n "$OPERATOR_NAME" ] && echo -e "    ${DIM}Operator  : ${WHITE}$OPERATOR_NAME${NC}"
+    [ -n "$INSTANSI_NAME" ] && echo -e "    ${DIM}Instansi  : ${WHITE}$INSTANSI_NAME${NC}"
+    [ ${#TARGETS[@]} -gt 0 ] && echo -e "    ${DIM}Target(s) : ${WHITE}${TARGETS[*]}${NC}"
+    [ "$STEALTH_MODE" = "true" ] && echo -e "    ${DIM}Stealth   : ${GREEN}ACTIVE${NC}" || echo -e "    ${DIM}Stealth   : ${RED}DISABLED${NC}"
+    echo ""
+}
+
+# ── SANITIZE DOMAIN ──────────────────────────────────────────────
+sanitize_domain() {
+    echo "$1" | sed 's|https\?://||g;s|/.*||g' | tr -d '[:space:]' | \
+        grep -oP '^[a-zA-Z0-9][a-zA-Z0-9._-]+[a-zA-Z0-9]$' || echo ""
+}
+
+# ── RISK SCORING ─────────────────────────────────────────────────
+calc_risk_score() {
+    local raw=$(( RISK_CRITICAL * 25 + RISK_HIGH * 10 + RISK_MEDIUM * 4 + RISK_LOW * 1 ))
+    [ "$raw" -gt 100 ] && echo 100 || echo "$raw"
+}
+get_risk_level() {
+    local s=$1
+    if   [ "$s" -gt 75 ]; then echo "CRITICAL"
+    elif [ "$s" -gt 50 ]; then echo "HIGH"
+    elif [ "$s" -gt 25 ]; then echo "MEDIUM"
+    elif [ "$s" -gt 10 ]; then echo "LOW"
+    else echo "SECURE"; fi
+}
+get_risk_color() {
+    local s=$1
+    if   [ "$s" -gt 75 ]; then echo "#ff2222"
+    elif [ "$s" -gt 50 ]; then echo "#ff6600"
+    elif [ "$s" -gt 25 ]; then echo "#ffaa00"
+    elif [ "$s" -gt 10 ]; then echo "#ffdd00"
+    else echo "#00ff41"; fi
+}
+
+# ── SESSION INIT ─────────────────────────────────────────────────
+input_setup() {
+    matrix_rain; banner
+
+    section "SESSION INITIALIZATION"
+    echo ""
+    echo -ne "  ${CYAN}[>]${NC} Operator / Team Name  : "; read -r OPERATOR_NAME
+    [ -z "$OPERATOR_NAME" ] && OPERATOR_NAME="NightOps"
+    echo -ne "  ${CYAN}[>]${NC} Klien / Instansi       : "; read -r INSTANSI_NAME
+    [ -z "$INSTANSI_NAME" ] && INSTANSI_NAME="Undisclosed"
+
+    echo ""
+    section "TARGET ACQUISITION"
+    echo ""
+    echo -e "  ${DIM}Masukkan target satu per satu. Ketik ${WHITE}done${DIM} jika sudah selesai.${NC}"
+    echo ""
+    local idx=1
+    while true; do
+        echo -ne "  ${CYAN}[target-$idx]${NC} > "; read -r raw_input
+        [[ "$raw_input" =~ ^(done|selesai|q|)$ ]] && break
+        local clean; clean=$(sanitize_domain "$raw_input")
+        if [ -n "$clean" ]; then
+            TARGETS+=("$clean"); ok "Target diterima: $clean"; idx=$((idx+1))
+        else
+            warn "Format tidak valid. Contoh: example.com"
+        fi
+    done
+    [ ${#TARGETS[@]} -eq 0 ] && { fail "Tidak ada target. Keluar."; exit 1; }
+
+    REPORT_DIR="$OUTPUT_DIR/${INSTANSI_NAME// /_}_$TIMESTAMP"
+    SCAN_LOG="$REPORT_DIR/scan.log"
+    mkdir -p "$REPORT_DIR"
+
+    echo ""
+    glitch_text "${#TARGETS[@]} target terkunci."
+    echo -e "  ${DIM}Laporan: $REPORT_DIR${NC}"; echo ""
+
+    echo -ne "  ${CYAN}[>]${NC} Stealth mode? [Y/n]: "; read -r sc
+    [[ "$sc" =~ ^[Nn]$ ]] && STEALTH_MODE="false" || STEALTH_MODE="true"
+    [ "$STEALTH_MODE" = "true" ] && ok "Stealth: ${GREEN}AKTIF${NC}" || warn "Stealth: NONAKTIF"
+
+    echo ""
+    echo -ne "  ${CYAN}[>]${NC} Proxy (kosong = skip): "; read -r pi
+    [ -n "$pi" ] && { PROXY="$pi"; ok "Proxy: $PROXY"; }
+
+    echo ""
+    echo -ne "  ${YELLOW}[!]${NC} Mulai scan? [Y/n]: "; read -r CONFIRM
+    [[ "$CONFIRM" =~ ^[Nn]$ ]] && { echo "  Dibatalkan."; exit 0; }
+    banner
+}
+
+# ── PARSE FINDINGS FROM v7 OUTPUT ────────────────────────────────
+parse_findings() {
+    local logfile="$1"
+    [ ! -f "$logfile" ] && return
+
+    RISK_CRITICAL=0; RISK_HIGH=0; RISK_MEDIUM=0; RISK_LOW=0; RISK_INFO=0
+    FINDINGS_DB=()
+
+    while IFS= read -r line; do
+        # Parse format: level=xxx title="xxx" resource="xxx"
+        local level title resource plugin
+        level=$(echo "$line"   | grep -oP 'level=\K\w+' | head -1)
+        title=$(echo "$line"   | grep -oP 'title="\K[^"]+' | head -1)
+        resource=$(echo "$line" | grep -oP 'resource="\K[^"]+' | head -1)
+        plugin=$(echo "$line"  | grep -oP 'plugin=\K\w+' | head -1)
+
+        [ -z "$title" ] && continue
+
+        case "$level" in
+            critical) RISK_CRITICAL=$((RISK_CRITICAL+1)); FINDINGS_DB+=("CRITICAL|$plugin|$title|$resource") ;;
+            high)     RISK_HIGH=$((RISK_HIGH+1));     FINDINGS_DB+=("HIGH|$plugin|$title|$resource") ;;
+            medium)   RISK_MEDIUM=$((RISK_MEDIUM+1)); FINDINGS_DB+=("MEDIUM|$plugin|$title|$resource") ;;
+            low)      RISK_LOW=$((RISK_LOW+1));       FINDINGS_DB+=("LOW|$plugin|$title|$resource") ;;
+            info|*)   RISK_INFO=$((RISK_INFO+1));     FINDINGS_DB+=("INFO|$plugin|$title|$resource") ;;
+        esac
+    done < <(grep " finding " "$logfile" 2>/dev/null)
+}
+
+# ── RUN SCAN ─────────────────────────────────────────────────────
+run_scan() {
+    local profile="${1:-default}"
+    local plugins="${2:-}"
+
+    section "MENJALANKAN SCAN — profile: $profile"
+    echo ""
+
+    local nc_args=("--profile" "$profile" "--operator" "$OPERATOR_NAME" "--client" "$INSTANSI_NAME")
+    [ -n "$plugins" ] && nc_args+=("--plugins" "$plugins")
+
+    for target in "${TARGETS[@]}"; do
+        info "Target: $target"
+        local target_log="$REPORT_DIR/${target//./_}_scan.log"
+
+        local nc_cmd=("$NC_BIN" "scan" "-t" "$target" "${nc_args[@]}" "-o" "$REPORT_DIR" "-f" "ndjson")
+
+        echo "" >> "$SCAN_LOG" 2>/dev/null
+        echo "=== SCAN: $target | $(date) ===" >> "$SCAN_LOG"
+
+        # Run scan, capture output to log dan tampilkan di terminal
+        "${nc_cmd[@]}" 2>&1 | tee -a "$SCAN_LOG" "$target_log"
+        echo ""
+    done
+
+    parse_findings "$SCAN_LOG"
+    generate_html_report
+    show_summary
+}
+
+# ── SUMMARY ──────────────────────────────────────────────────────
+show_summary() {
+    local risk_score; risk_score=$(calc_risk_score)
+    local risk_level; risk_level=$(get_risk_level "$risk_score")
+
+    echo ""
+    section "✅ SCAN SELESAI"
+    echo ""
+    echo -e "  ${DIM}Risk Score : ${WHITE}${risk_score}/100 (${risk_level})${NC}"
+    echo -e "  ${RED}Critical   : $RISK_CRITICAL${NC}"
+    echo -e "  ${YELLOW}High       : $RISK_HIGH${NC}"
+    echo -e "  ${YELLOW}Medium     : $RISK_MEDIUM${NC}"
+    echo -e "  ${GREEN}Low        : $RISK_LOW${NC}"
+    echo -e "  ${DIM}Info       : $RISK_INFO${NC}"
+    echo ""
+    ok "Laporan HTML : $REPORT_DIR/NIGHTCRAWLER_REPORT.html"
+    echo ""
+
+    # Buka laporan di browser jika ada
+    if command -v xdg-open &>/dev/null; then
+        echo -ne "  ${CYAN}[>]${NC} Buka laporan di browser? [Y/n]: "; read -r ob
+        [[ ! "$ob" =~ ^[Nn]$ ]] && xdg-open "$REPORT_DIR/NIGHTCRAWLER_REPORT.html" 2>/dev/null &
+    fi
+}
+
+# ══════════════════════════════════════════════════════════════════
+#  GENERATE INTERACTIVE HTML REPORT
+# ══════════════════════════════════════════════════════════════════
+generate_html_report() {
+    local REPORT_HTML="$REPORT_DIR/NIGHTCRAWLER_REPORT.html"
+    local risk_score; risk_score=$(calc_risk_score)
+    local risk_level; risk_level=$(get_risk_level "$risk_score")
+    local risk_color; risk_color=$(get_risk_color "$risk_score")
+
+    # Hitung arc gauge
+    local arc_angle=$((risk_score * 180 / 100))
+    local rad_end; rad_end=$(awk "BEGIN{printf \"%.6f\", 3.14159265 - ($arc_angle * 3.14159265 / 180)}")
+    local x_end; x_end=$(awk "BEGIN{printf \"%.2f\", 100 + 80 * cos($rad_end)}")
+    local y_end; y_end=$(awk "BEGIN{printf \"%.2f\", 100 - 80 * sin($rad_end)}")
+    local large_arc; large_arc=$([ "$arc_angle" -gt 180 ] && echo 1 || echo 0)
+
+    # Build findings JSON untuk JavaScript
+    local findings_json="["
+    local first=1
+    for f in "${FINDINGS_DB[@]}"; do
+        local f_level f_plugin f_title f_resource
+        f_level=$(echo "$f"    | cut -d'|' -f1)
+        f_plugin=$(echo "$f"   | cut -d'|' -f2)
+        f_title=$(echo "$f"    | cut -d'|' -f3 | sed 's/"/\\"/g')
+        f_resource=$(echo "$f" | cut -d'|' -f4 | sed 's/"/\\"/g')
+        [ "$first" -eq 1 ] && first=0 || findings_json+=","
+        findings_json+="{\"level\":\"$f_level\",\"plugin\":\"$f_plugin\",\"title\":\"$f_title\",\"resource\":\"$f_resource\"}"
+    done
+    findings_json+="]"
+
+    # Build scan log content
+    local log_content=""
+    [ -f "$SCAN_LOG" ] && log_content=$(sed 's/</\&lt;/g;s/>/\&gt;/g;s/\x1b\[[0-9;]*m//g' "$SCAN_LOG" | tail -200)
+
+    cat > "$REPORT_HTML" << HTMLEOF
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NIGHTCRAWLER Report — ${INSTANSI_NAME}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:      #080c08;
+    --bg2:     #0d110d;
+    --bg3:     #121812;
+    --bg4:     #161e16;
+    --border:  #1a2a1a;
+    --border2: #22332a;
+    --green:   #00ff41;
+    --green2:  #39ff14;
+    --green3:  #00cc33;
+    --cyan:    #00e5ff;
+    --red:     #ff2244;
+    --orange:  #ff6600;
+    --yellow:  #ffcc00;
+    --text:    #b0c8b0;
+    --text2:   #607060;
+    --text3:   #405040;
+}
+
+body {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Scanline overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+
+/* ── HEADER ── */
+.header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    border: 1px solid var(--border2);
+    background: linear-gradient(180deg, #050e05 0%, var(--bg) 100%);
+    margin-bottom: 24px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, var(--green) 30%, var(--cyan) 70%, transparent 100%);
+    animation: scan 3s ease-in-out infinite;
+}
+@keyframes scan {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+.spider {
+    color: var(--green);
+    font-size: 0.9em;
+    opacity: 0.6;
+    margin-bottom: 16px;
+    letter-spacing: 1px;
+}
+.header h1 {
+    color: var(--green);
+    font-size: 2.4em;
+    font-weight: 700;
+    letter-spacing: 8px;
+    text-shadow: 0 0 30px rgba(0,255,65,0.4), 0 0 60px rgba(0,255,65,0.1);
+    margin-bottom: 4px;
+}
+.header .subtitle {
+    color: var(--text2);
+    font-size: 0.75em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+/* ── DASHBOARD GRID ── */
+.dashboard {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+@media (max-width: 800px) { .dashboard { grid-template-columns: 1fr; } }
+
+/* ── GAUGE ── */
+.gauge-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 28px 20px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.gauge-title {
+    color: var(--text2);
+    font-size: 0.7em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+.gauge { position: relative; width: 200px; height: 112px; }
+.gauge svg { width: 200px; height: 112px; }
+.gauge-score {
+    font-size: 3em;
+    font-weight: 700;
+    color: ${risk_color};
+    text-shadow: 0 0 20px ${risk_color}44;
+    margin-top: 4px;
+    line-height: 1;
+}
+.gauge-label {
+    font-size: 0.9em;
+    font-weight: 600;
+    color: ${risk_color};
+    letter-spacing: 3px;
+    margin-top: 6px;
+}
+
+/* ── INFO PANEL ── */
+.info-panel { display: flex; flex-direction: column; gap: 16px; }
+.meta-table {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.meta-table table { width: 100%; border-collapse: collapse; }
+.meta-table th, .meta-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+}
+.meta-table tr:last-child th,
+.meta-table tr:last-child td { border-bottom: none; }
+.meta-table th {
+    background: var(--bg3);
+    color: var(--green3);
+    font-weight: 500;
+    width: 110px;
+    white-space: nowrap;
+}
+.meta-table td { color: var(--text); }
+
+/* ── STAT CARDS ── */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+@media (max-width: 600px) { .stats-grid { grid-template-columns: repeat(3, 1fr); } }
+.stat-card {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 16px 10px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-card .num { font-size: 2.2em; font-weight: 700; line-height: 1; }
+.stat-card .lbl { font-size: 0.65em; color: var(--text2); margin-top: 5px; letter-spacing: 2px; }
+.stat-card.critical { border-color: #ff224422; }
+.stat-card.critical:hover { border-color: var(--red); }
+.stat-card.critical .num { color: var(--red); text-shadow: 0 0 10px rgba(255,34,68,0.3); }
+.stat-card.high { border-color: #ff660022; }
+.stat-card.high:hover { border-color: var(--orange); }
+.stat-card.high .num { color: var(--orange); }
+.stat-card.medium { border-color: #ffcc0022; }
+.stat-card.medium:hover { border-color: var(--yellow); }
+.stat-card.medium .num { color: var(--yellow); }
+.stat-card.low { border-color: #00ff4122; }
+.stat-card.low:hover { border-color: var(--green); }
+.stat-card.low .num { color: var(--green); }
+.stat-card.info-s { border-color: #00e5ff22; }
+.stat-card.info-s:hover { border-color: var(--cyan); }
+.stat-card.info-s .num { color: var(--cyan); }
+
+/* ── TABS ── */
+.tabs {
+    display: flex;
+    border-bottom: 2px solid var(--border2);
+    margin-bottom: 0;
+    gap: 2px;
+}
+.tab-btn {
+    padding: 11px 22px;
+    background: transparent;
+    border: none;
+    color: var(--text2);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+}
+.tab-btn:hover { color: var(--green); }
+.tab-btn.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+    background: var(--bg2);
+}
+.tab-content { display: none; padding: 20px 0; }
+.tab-content.active { display: block; }
+
+/* ── FILTER BUTTONS ── */
+.filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+.filter-btn {
+    padding: 5px 16px;
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    background: var(--bg2);
+    color: var(--text2);
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+}
+.filter-btn:hover, .filter-btn.active { color: var(--green); border-color: var(--green); }
+.filter-btn[data-level="CRITICAL"].active { color: var(--red); border-color: var(--red); }
+.filter-btn[data-level="HIGH"].active { color: var(--orange); border-color: var(--orange); }
+.filter-btn[data-level="MEDIUM"].active { color: var(--yellow); border-color: var(--yellow); }
+.filter-btn[data-level="INFO"].active { color: var(--cyan); border-color: var(--cyan); }
+
+.search-box {
+    margin-left: auto;
+    padding: 5px 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 11px;
+    border-radius: 2px;
+    width: 200px;
+    outline: none;
+}
+.search-box:focus { border-color: var(--green); }
+
+/* ── FINDING CARDS ── */
+.finding {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-left: 4px solid transparent;
+    padding: 14px 16px;
+    margin: 8px 0;
+    border-radius: 0 4px 4px 0;
+    transition: background 0.15s, border-left-color 0.15s;
+    cursor: default;
+}
+.finding:hover { background: var(--bg3); }
+.finding.CRITICAL { border-left-color: var(--red); }
+.finding.HIGH     { border-left-color: var(--orange); }
+.finding.MEDIUM   { border-left-color: var(--yellow); }
+.finding.LOW      { border-left-color: var(--green); }
+.finding.INFO     { border-left-color: var(--cyan); }
+
+.finding-header { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+.badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 2px;
+    font-size: 0.65em;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #000;
+    flex-shrink: 0;
+}
+.badge.CRITICAL { background: var(--red); }
+.badge.HIGH     { background: var(--orange); }
+.badge.MEDIUM   { background: var(--yellow); }
+.badge.LOW      { background: var(--green); }
+.badge.INFO     { background: var(--cyan); }
+
+.plugin-tag {
+    font-size: 0.65em;
+    color: var(--green3);
+    border: 1px solid var(--border2);
+    padding: 1px 8px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+}
+.finding-title { font-size: 0.9em; color: var(--text); font-weight: 500; }
+.finding-resource { font-size: 0.8em; color: var(--text2); margin-top: 4px; word-break: break-all; }
+
+.no-findings {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text2);
+}
+.no-findings .icon { font-size: 3em; margin-bottom: 12px; }
+
+/* ── COLLAPSIBLE ── */
+.collapsible {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+}
+.coll-header {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.15s;
+    user-select: none;
+}
+.coll-header:hover { background: var(--bg3); }
+.coll-header h3 { color: var(--green3); font-size: 0.85em; letter-spacing: 1px; }
+.coll-arrow { color: var(--green3); transition: transform 0.25s; font-size: 0.8em; }
+.coll-header.open .coll-arrow { transform: rotate(90deg); }
+.coll-body { display: none; border-top: 1px solid var(--border2); padding: 14px 16px; }
+pre {
+    background: #020602;
+    border: 1px solid var(--border);
+    padding: 12px;
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    border-radius: 2px;
+    max-height: 350px;
+    overflow-y: auto;
+    color: var(--text);
+    line-height: 1.5;
+}
+
+/* ── RISK TABLE ── */
+.risk-table-wrap {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+.risk-table-wrap h3 {
+    padding: 12px 16px;
+    color: var(--green3);
+    font-size: 0.8em;
+    letter-spacing: 2px;
+    border-bottom: 1px solid var(--border2);
+    background: var(--bg3);
+}
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 9px 14px; border-bottom: 1px solid var(--border); text-align: left; }
+tr:last-child td { border-bottom: none; }
+th { background: var(--bg3); color: var(--green3); font-weight: 500; }
+tr:hover td { background: var(--bg3); }
+
+/* ── PRINT BUTTON ── */
+.fab {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    padding: 12px 22px;
+    background: var(--green);
+    color: #000;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(0,255,65,0.3);
+    transition: all 0.2s;
+}
+.fab:hover {
+    background: var(--green2);
+    box-shadow: 0 6px 25px rgba(0,255,65,0.5);
+    transform: translateY(-1px);
+}
+
+/* ── FOOTER ── */
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    border-top: 1px solid var(--border2);
+    color: var(--text3);
+    font-size: 0.75em;
+    letter-spacing: 1px;
+}
+
+/* ── PRINT STYLES ── */
+@media print {
+    body { background: #fff; color: #000; font-size: 10px; }
+    body::before { display: none; }
+    .header { background: #fff; border-color: #000; }
+    .header h1, .gauge-score, .gauge-label { color: #000 !important; text-shadow: none; }
+    .fab, .tabs { display: none !important; }
+    .tab-content { display: block !important; }
+    th { background: #eee !important; color: #000 !important; }
+    td { border-color: #ccc !important; }
+    pre { border-color: #999; max-height: none; }
+    .finding { break-inside: avoid; border-left-width: 3px; }
+    .badge { color: #fff !important; }
+    .stat-card, .gauge-card, .meta-table, .collapsible, .risk-table-wrap {
+        border-color: #ccc;
+        background: #fff;
+    }
+    .coll-body { display: block !important; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="spider">
+    ╲  ╲ │ ╱  ╱<br>
+    &nbsp;╲  ╲│╱  ╱<br>
+    ╺━━━[◉ ◉]━━━╸<br>
+    &nbsp;╱  ╱│╲  ╲<br>
+    ╱  ╱ │ ╲  ╲
+  </div>
+  <h1>NIGHTCRAWLER</h1>
+  <div class="subtitle">v7.0 &nbsp;·&nbsp; Security Assessment Report &nbsp;·&nbsp; ${INSTANSI_NAME}</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+
+  <!-- Gauge -->
+  <div class="gauge-card">
+    <div class="gauge-title">Risk Score</div>
+    <div class="gauge">
+      <svg viewBox="0 0 200 112">
+        <path d="M 20,100 A 80,80 0 0,1 180,100" fill="none" stroke="#1a2a1a" stroke-width="14" stroke-linecap="round"/>
+        <path d="M 20,100 A 80,80 0 ${large_arc},1 ${x_end},${y_end}" fill="none" stroke="${risk_color}" stroke-width="14" stroke-linecap="round" filter="url(#glow)"/>
+        <defs>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+      </svg>
+    </div>
+    <div class="gauge-score">${risk_score}</div>
+    <div class="gauge-label">${risk_level}</div>
+  </div>
+
+  <!-- Info + Stats -->
+  <div class="info-panel">
+    <div class="meta-table">
+      <table>
+        <tr><th>Operator</th><td>${OPERATOR_NAME}</td></tr>
+        <tr><th>Instansi</th><td>${INSTANSI_NAME}</td></tr>
+        <tr><th>Target(s)</th><td>${TARGETS[*]}</td></tr>
+        <tr><th>Tanggal</th><td>$(date '+%d %B %Y, %H:%M:%S')</td></tr>
+        <tr><th>Stealth</th><td>$([ "$STEALTH_MODE" = "true" ] && echo "AKTIF" || echo "NONAKTIF")</td></tr>
+        <tr><th>Scanner</th><td>NIGHTCRAWLER v7.0.0</td></tr>
+      </table>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card critical"><div class="num">${RISK_CRITICAL}</div><div class="lbl">CRITICAL</div></div>
+      <div class="stat-card high"><div class="num">${RISK_HIGH}</div><div class="lbl">HIGH</div></div>
+      <div class="stat-card medium"><div class="num">${RISK_MEDIUM}</div><div class="lbl">MEDIUM</div></div>
+      <div class="stat-card low"><div class="num">${RISK_LOW}</div><div class="lbl">LOW</div></div>
+      <div class="stat-card info-s"><div class="num">${RISK_INFO}</div><div class="lbl">INFO</div></div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('findings',this)">⚠ Temuan</button>
+  <button class="tab-btn" onclick="switchTab('log',this)">📋 Log Scan</button>
+  <button class="tab-btn" onclick="switchTab('scoring',this)">📊 Risk Scoring</button>
+</div>
+
+<!-- TAB: FINDINGS -->
+<div class="tab-content active" id="tab-findings">
+  <div class="filter-bar">
+    <button class="filter-btn active" data-level="ALL" onclick="filterFindings(this)">Semua (${#FINDINGS_DB[@]})</button>
+    <button class="filter-btn" data-level="CRITICAL" onclick="filterFindings(this)">Critical (${RISK_CRITICAL})</button>
+    <button class="filter-btn" data-level="HIGH" onclick="filterFindings(this)">High (${RISK_HIGH})</button>
+    <button class="filter-btn" data-level="MEDIUM" onclick="filterFindings(this)">Medium (${RISK_MEDIUM})</button>
+    <button class="filter-btn" data-level="LOW" onclick="filterFindings(this)">Low (${RISK_LOW})</button>
+    <button class="filter-btn" data-level="INFO" onclick="filterFindings(this)">Info (${RISK_INFO})</button>
+    <input class="search-box" type="text" placeholder="Cari temuan..." oninput="searchFindings(this.value)">
+  </div>
+  <div id="findings-container"></div>
+</div>
+
+<!-- TAB: LOG -->
+<div class="tab-content" id="tab-log">
+  <div class="collapsible">
+    <div class="coll-header open" onclick="toggleColl('log-raw',this)">
+      <h3>📄 RAW SCAN LOG</h3><span class="coll-arrow">▶</span>
+    </div>
+    <div class="coll-body" id="log-raw" style="display:block">
+      <pre id="log-content">${log_content}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: SCORING -->
+<div class="tab-content" id="tab-scoring">
+  <div class="risk-table-wrap">
+    <h3>FORMULA RISK SCORING</h3>
+    <table>
+      <tr><th>Level</th><th>Jumlah</th><th>Bobot</th><th>Kontribusi</th></tr>
+      <tr><td style="color:var(--red)">Critical</td><td>${RISK_CRITICAL}</td><td>× 25</td><td>${RISK_CRITICAL} × 25 = $((RISK_CRITICAL*25))</td></tr>
+      <tr><td style="color:var(--orange)">High</td><td>${RISK_HIGH}</td><td>× 10</td><td>${RISK_HIGH} × 10 = $((RISK_HIGH*10))</td></tr>
+      <tr><td style="color:var(--yellow)">Medium</td><td>${RISK_MEDIUM}</td><td>× 4</td><td>${RISK_MEDIUM} × 4 = $((RISK_MEDIUM*4))</td></tr>
+      <tr><td style="color:var(--green)">Low</td><td>${RISK_LOW}</td><td>× 1</td><td>${RISK_LOW} × 1 = ${RISK_LOW}</td></tr>
+      <tr><th colspan="3">Total (max 100)</th><th style="color:${risk_color}">${risk_score} / 100 — ${risk_level}</th></tr>
+    </table>
+  </div>
+  <div class="risk-table-wrap">
+    <h3>SKALA RISIKO</h3>
+    <table>
+      <tr><th>Skor</th><th>Level</th><th>Interpretasi</th></tr>
+      <tr><td>76 – 100</td><td style="color:var(--red)">CRITICAL</td><td>Sistem dalam kondisi kritis, tindakan segera diperlukan</td></tr>
+      <tr><td>51 – 75</td><td style="color:var(--orange)">HIGH</td><td>Risiko tinggi, perbaikan prioritas dalam 24-48 jam</td></tr>
+      <tr><td>26 – 50</td><td style="color:var(--yellow)">MEDIUM</td><td>Risiko sedang, perbaikan dalam 1-2 minggu</td></tr>
+      <tr><td>11 – 25</td><td style="color:var(--green)">LOW</td><td>Risiko rendah, perlu perhatian tapi tidak mendesak</td></tr>
+      <tr><td>0 – 10</td><td style="color:var(--cyan)">SECURE</td><td>Sistem relatif aman sesuai cakupan scan</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  🕷️ &nbsp; Report dihasilkan oleh <strong>NIGHTCRAWLER v7.0</strong> &nbsp;·&nbsp;
+  1607-NetEnginee / Cyberoutcast &nbsp;·&nbsp;
+  $(date '+%d %B %Y')
+</div>
+
+</div><!-- /container -->
+
+<button class="fab" onclick="window.print()">🖨️ &nbsp; Export PDF</button>
+
+<script>
+// Findings data
+const findings = ${findings_json};
+
+// Render findings
+function renderFindings(list) {
+    const c = document.getElementById('findings-container');
+    if (!list.length) {
+        c.innerHTML = '<div class="no-findings"><div class="icon">✅</div><div>Tidak ada temuan pada filter ini</div></div>';
+        return;
+    }
+    const levelOrder = {CRITICAL:0, HIGH:1, MEDIUM:2, LOW:3, INFO:4};
+    list.sort((a,b) => (levelOrder[a.level]||4) - (levelOrder[b.level]||4));
+    c.innerHTML = list.map((f, i) => \`
+        <div class="finding \${f.level}" data-level="\${f.level}" data-title="\${f.title.toLowerCase()}" data-plugin="\${f.plugin}">
+            <div class="finding-header">
+                <span class="badge \${f.level}">\${f.level}</span>
+                <span class="plugin-tag">\${f.plugin || 'unknown'}</span>
+            </div>
+            <div class="finding-title">\${f.title}</div>
+            \${f.resource ? '<div class="finding-resource">→ ' + f.resource + '</div>' : ''}
+        </div>
+    \`).join('');
+}
+
+// Init render
+renderFindings(findings);
+
+// Filter
+function filterFindings(btn) {
+    const level = btn.dataset.level;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filtered = level === 'ALL' ? findings : findings.filter(f => f.level === level);
+    renderFindings(filtered);
+}
+
+// Search
+function searchFindings(q) {
+    const ql = q.toLowerCase();
+    const activeLevel = document.querySelector('.filter-btn.active')?.dataset.level || 'ALL';
+    let list = activeLevel === 'ALL' ? findings : findings.filter(f => f.level === activeLevel);
+    if (ql) list = list.filter(f => f.title.toLowerCase().includes(ql) || (f.resource||'').toLowerCase().includes(ql) || (f.plugin||'').toLowerCase().includes(ql));
+    renderFindings(list);
+}
+
+// Tab switch
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+// Collapsible
+function toggleColl(id, header) {
+    const body = document.getElementById(id);
+    const isOpen = body.style.display === 'block';
+    body.style.display = isOpen ? 'none' : 'block';
+    header.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
+HTMLEOF
+
+    ok "HTML Report → $REPORT_HTML"
+}
+
+# ── MENU ─────────────────────────────────────────────────────────
+show_menu() {
+    banner
+    echo -e "${GREEN}${BOLD}  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓${NC}"
+    echo -e "${GREEN}${BOLD}  ┃  PILIH OPERASI                                            ┃${NC}"
+    echo -e "${GREEN}${BOLD}  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛${NC}"
+    echo ""
+    echo -e "  ${WHITE}[1]${NC}  🚀  FULL SCAN — Semua plugin  ${DIM}(recommended)${NC}"
+    echo -e "  ${WHITE}[2]${NC}  ⚡  QUICK SCAN — Scan cepat"
+    echo -e "  ${WHITE}[3]${NC}  🔍  DNS & Subdomain only"
+    echo -e "  ${WHITE}[4]${NC}  🔒  TLS / SSL only"
+    echo -e "  ${WHITE}[5]${NC}  📋  Headers only"
+    echo -e "  ${WHITE}[6]${NC}  🕵️   Stealth scan"
+    echo -e "  ${WHITE}[7]${NC}  📊  Compliance scan (SARIF output)"
+    echo -e "  ${WHITE}[8]${NC}  📂  Buka laporan terakhir di browser"
+    echo -e "  ${WHITE}[9]${NC}  🎯  Ganti target"
+    echo -e "  ${WHITE}[0]${NC}  ❌  Keluar"
+    echo ""
+    echo -e "  ${DIM}Target(s) : ${CYAN}${TARGETS[*]}${NC}"
+    echo -e "  ${DIM}Stealth   : $([ "$STEALTH_MODE" = "true" ] && echo -e "${GREEN}ON${NC}" || echo -e "${RED}OFF${NC}") ${DIM}| Proxy: ${PROXY:-none}${NC}"
+    echo ""
+    echo -ne "  ${GREEN}nightcrawler${NC} > "
+}
+
+main() {
+    # Cek binary
+    if ! command -v "$NC_BIN" &>/dev/null; then
+        echo -e "${RED}[!] nightcrawler binary tidak ditemukan di PATH.${NC}"
+        echo -e "${YELLOW}[i] Install dulu: curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash${NC}"
+        exit 1
+    fi
+
+    mkdir -p "$OUTPUT_DIR"
+    input_setup
+
+    while true; do
+        show_menu; read -r CHOICE
+        case "$CHOICE" in
+            1) run_scan "default" ;;
+            2) run_scan "quick" ;;
+            3) run_scan "default" "dns,crtsh" ;;
+            4) run_scan "default" "tls" ;;
+            5) run_scan "default" "headers" ;;
+            6) STEALTH_MODE="true"; run_scan "stealth" ;;
+            7) run_scan "compliance" ;;
+            8)
+                local last_report
+                last_report=$(find "$OUTPUT_DIR" -name "NIGHTCRAWLER_REPORT.html" -newer "$OUTPUT_DIR" 2>/dev/null | sort | tail -1)
+                if [ -n "$last_report" ]; then
+                    xdg-open "$last_report" 2>/dev/null || warn "Tidak bisa buka browser. Path: $last_report"
+                else
+                    warn "Belum ada laporan. Jalankan scan dulu."
+                fi
+                ;;
+            9)
+                TARGETS=()
+                echo ""
+                echo -e "  ${DIM}Masukkan target baru. Ketik ${WHITE}done${DIM} jika selesai.${NC}"; echo ""
+                local idx=1
+                while true; do
+                    echo -ne "  ${CYAN}[target-$idx]${NC} > "; read -r raw
+                    [[ "$raw" =~ ^(done|selesai|q|)$ ]] && break
+                    local clean; clean=$(sanitize_domain "$raw")
+                    [ -n "$clean" ] && { TARGETS+=("$clean"); ok "Target: $clean"; idx=$((idx+1)); } || warn "Format tidak valid."
+                done
+                [ ${#TARGETS[@]} -eq 0 ] && warn "Target tidak diubah."
+                ;;
+            0)
+                echo ""
+                glitch_text "NIGHTCRAWLER signing off."
+                echo ""; exit 0
+                ;;
+            *) fail "Pilihan tidak valid." ;;
+        esac
+        echo ""
+        echo -ne "  ${CYAN}[>]${NC} Kembali ke menu? [Y/n]: "; read -r back
+        [[ "$back" =~ ^[Nn]$ ]] && { glitch_text "NIGHTCRAWLER signing off."; echo ""; exit 0; }
+    done
+}
+
+main "$@"
