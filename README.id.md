@@ -45,8 +45,7 @@ Ambil archive yang sesuai dari [halaman releases](https://github.com/1607-NetEng
 ### Docker
 
 ```bash
-docker pull ghcr.io/1607-netengineee/nightcrawler:latest
-docker run --rm ghcr.io/1607-netengineee/nightcrawler:latest scan -t example.com
+> ⚠️ Docker image belum tersedia di versi ini.
 ```
 
 ### Build dari source

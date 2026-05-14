@@ -55,14 +55,13 @@ go install github.com/1607-NetEnginee/NightCrawler/cmd/nightcrawler@latest
 ### Docker
 
 ```bash
-docker pull ghcr.io/1607-netengineee/nightcrawler:latest
-docker run --rm ghcr.io/1607-netengineee/nightcrawler:latest scan -t example.com
+> ⚠️ Docker image belum tersedia di versi ini.
 ```
 
 ### Homebrew (macOS / Linux)
 
 ```bash
-brew install 1607-netengineee/tap/nightcrawler
+> ⚠️ Homebrew tap belum tersedia di versi ini.
 ```
 
 ### Build from source
