@@ -16,6 +16,7 @@ set -euo pipefail
 NC_REPO="1607-NetEnginee/NightCrawler"
 NC_VERSION="${NC_VERSION:-latest}"
 NC_INSTALL_DIR="${NC_INSTALL_DIR:-/usr/local/bin}"
+TMPDIR_CLEANUP=""
 NC_SKIP_VERIFY="${NC_SKIP_VERIFY:-0}"
 
 # ── styling ────────────────────────────────────────────────────────
@@ -73,8 +74,9 @@ main() {
     local archive="nightcrawler_${stripped}_${platform}.tar.gz"
     local base_url="https://github.com/${NC_REPO}/releases/download/${version}"
 
-    local tmpdir; tmpdir=$(mktemp -d)
-    trap 'rm -rf "$tmpdir"' EXIT
+    TMPDIR_CLEANUP=$(mktemp -d)
+    local tmpdir="$TMPDIR_CLEANUP"
+    trap 'rm -rf "$TMPDIR_CLEANUP"' EXIT
     cd "$tmpdir"
 
     say "Downloading ${archive}"
