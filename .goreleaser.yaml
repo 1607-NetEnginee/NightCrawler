@@ -62,38 +62,38 @@ checksum:
 snapshot:
   version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
 
-dockers:
-  - image_templates:
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
-    dockerfile: deployments/docker/Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/amd64"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goarch: amd64
-
-  - image_templates:
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
-    dockerfile: deployments/docker/Dockerfile
-    use: buildx
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--label=org.opencontainers.image.version={{ .Version }}"
-      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
-      - "--label=org.opencontainers.image.created={{ .Date }}"
-    goarch: arm64
-
-docker_manifests:
-  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}"
-    image_templates:
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:latest"
-    image_templates:
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
-      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
+##dockers:
+##  - image_templates:
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+##    dockerfile: deployments/docker/Dockerfile
+##    use: buildx
+##    build_flag_templates:
+##      - "--platform=linux/amd64"
+##      - "--label=org.opencontainers.image.version={{ .Version }}"
+##      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+##      - "--label=org.opencontainers.image.created={{ .Date }}"
+##    goarch: amd64
+##
+##  - image_templates:
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
+##    dockerfile: deployments/docker/Dockerfile
+##    use: buildx
+##    build_flag_templates:
+##      - "--platform=linux/arm64"
+##      - "--label=org.opencontainers.image.version={{ .Version }}"
+##      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+##      - "--label=org.opencontainers.image.created={{ .Date }}"
+##    goarch: arm64
+##
+##docker_manifests:
+##  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}"
+##    image_templates:
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
+##  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:latest"
+##    image_templates:
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+##      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
 
 changelog:
   sort: asc
