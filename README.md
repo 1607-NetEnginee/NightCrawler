@@ -4,11 +4,11 @@
 >
 > by **HnyBadger** / **Cyberoutcast**
 
-[![ci](https://github.com/HnyBadger/nightcrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/HnyBadger/nightcrawler/actions/workflows/ci.yml)
-[![release](https://img.shields.io/github/v/release/HnyBadger/nightcrawler)](https://github.com/HnyBadger/nightcrawler/releases)
-[![codeql](https://github.com/HnyBadger/nightcrawler/actions/workflows/codeql.yml/badge.svg)](https://github.com/HnyBadger/nightcrawler/actions/workflows/codeql.yml)
-[![go report](https://goreportcard.com/badge/github.com/HnyBadger/nightcrawler)](https://goreportcard.com/report/github.com/HnyBadger/nightcrawler)
-[![license](https://img.shields.io/github/license/HnyBadger/nightcrawler)](LICENSE)
+[![ci](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/1607-NetEnginee/NightCrawler)](https://github.com/1607-NetEnginee/NightCrawler/releases)
+[![codeql](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/codeql.yml/badge.svg)](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/codeql.yml)
+[![go report](https://goreportcard.com/badge/github.com/1607-NetEnginee/NightCrawler)](https://goreportcard.com/report/github.com/1607-NetEnginee/NightCrawler)
+[![license](https://img.shields.io/github/license/1607-NetEnginee/NightCrawler)](LICENSE)
 
 NIGHTCRAWLER is a modular, plugin-driven offensive security framework, written in Go. It is the production-grade successor to the v6.1 Bash framework — a complete re-architecture that preserves five iterations of false-positive engineering, the Indonesian government/education path knowledge, and the bilingual mitigation guidance that defined v6.x, while removing the monolithic, sequential, subprocess-heavy machinery that limited it.
 
@@ -37,26 +37,26 @@ Read the design document at [`docs/ANALYSIS_AND_REDESIGN.md`](docs/ANALYSIS_AND_
 ### Single-line installer
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash
 ```
 
 The installer verifies the SHA-256 checksum and the Sigstore signature of the release artifact before installing.
 
 ### Manual download
 
-Grab the appropriate archive from the [releases page](https://github.com/HnyBadger/nightcrawler/releases) and extract it. Binary is portable; copy it anywhere on your `$PATH`.
+Grab the appropriate archive from the [releases page](https://github.com/1607-NetEnginee/NightCrawler/releases) and extract it. Binary is portable; copy it anywhere on your `$PATH`.
 
 ### Go install
 
 ```bash
-go install github.com/HnyBadger/nightcrawler/cmd/nightcrawler@latest
+go install github.com/1607-NetEnginee/NightCrawler/cmd/nightcrawler@latest
 ```
 
 ### Docker
 
 ```bash
-docker pull ghcr.io/hnybadger/nightcrawler:latest
-docker run --rm ghcr.io/hnybadger/nightcrawler:latest scan -t example.com
+docker pull ghcr.io/1607-netengineee/nightcrawler:latest
+docker run --rm ghcr.io/1607-netengineee/nightcrawler:latest scan -t example.com
 ```
 
 ### Homebrew (macOS / Linux)
@@ -68,7 +68,7 @@ brew install hnybadger/tap/nightcrawler
 ### Build from source
 
 ```bash
-git clone https://github.com/HnyBadger/nightcrawler
+git clone https://github.com/1607-NetEnginee/NightCrawler
 cd nightcrawler
 make build
 ./bin/nightcrawler --help
@@ -156,8 +156,8 @@ package myplugin
 import (
     "context"
 
-    "github.com/HnyBadger/nightcrawler/internal/plugin"
-    "github.com/HnyBadger/nightcrawler/pkg/api"
+    "github.com/1607-NetEnginee/NightCrawler/internal/plugin"
+    "github.com/1607-NetEnginee/NightCrawler/pkg/api"
 )
 
 type Plugin struct{}
