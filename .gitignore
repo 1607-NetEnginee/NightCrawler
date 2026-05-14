@@ -1,0 +1,46 @@
+# ── build artifacts ─────────────────────────────────────────────────
+/bin/
+/dist/
+*.exe
+*.test
+*.out
+cover.out
+cover.html
+coverage.html
+
+# ── editors ─────────────────────────────────────────────────────────
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ── env & local state ───────────────────────────────────────────────
+.env
+.env.local
+*.local.yaml
+*.local.yml
+
+# ── go ──────────────────────────────────────────────────────────────
+vendor/
+go.work
+go.work.sum
+
+# ── project-specific ────────────────────────────────────────────────
+reports/
+nightcrawler-reports/
+/tmp/
+*.ndjson
+!signatures/**/*.yaml
+!configs/**/*.yaml
+
+# ── secrets & artifacts that should never be checked in ─────────────
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.age
+secrets.yaml

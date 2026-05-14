@@ -1,0 +1,146 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Example configuration
+#  Author: HnyBadger / Cyberoutcast
+#  Docs:   https://github.com/HnyBadger/nightcrawler/blob/main/docs/CONFIGURATION.md
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: Configuration
+
+# ── Identity ────────────────────────────────────────────────────────
+identity:
+  operator: HnyBadger
+  organization: Cyberoutcast
+  contact: ops@cyberoutcast.id
+
+# ── Output ──────────────────────────────────────────────────────────
+output:
+  base_dir: ${HOME}/nightcrawler-reports
+  format: [ndjson, html, sarif]              # legacy: txt
+  filename_template: "{date}_{target}_{scan_id}"
+  encrypt:
+    enabled: false
+    recipient: ""                            # age public key (P1+)
+  retention:
+    keep_raw_artifacts_days: 30
+    keep_reports_days: 365
+    compress_after_days: 7
+
+# ── HTTP Engine ─────────────────────────────────────────────────────
+http:
+  timeout: 15s
+  max_redirects: 5
+  max_body_size: 5MiB
+  user_agent_pool: pool://default            # built-in pool atau path file
+  follow_redirects: true
+  proxy: ""                                  # http://127.0.0.1:8080 untuk Burp
+  tls:
+    verify: true
+    min_version: "1.2"
+  connection_pool:
+    max_per_host: 10
+    idle_timeout: 90s
+  rate_limit:
+    global_rps: 200
+    per_host_rps: 10
+    adaptive: true                           # backoff pada 429/503
+  stealth:
+    enabled: true
+    jitter_min: 0.3s
+    jitter_max: 0.8s
+    rotate_user_agent: true
+    rotate_referer: true
+    sec_fetch_headers: true
+
+# ── DNS ─────────────────────────────────────────────────────────────
+dns:
+  resolvers: [system, 1.1.1.1, 8.8.8.8]
+  timeout: 3s
+  retries: 1
+  parallel: 50
+  bruteforce:
+    wordlist: builtin                        # atau path
+    max_concurrent: 50
+
+# ── Concurrency ─────────────────────────────────────────────────────
+concurrency:
+  max_targets: auto                          # = NumCPU()
+  max_plugins_per_target: auto
+  max_probes_per_plugin: 20
+
+# ── Plugins ─────────────────────────────────────────────────────────
+plugins:
+  enabled:                                   # order does not matter (DAG)
+    - dns
+    - tls
+    - headers
+    - ports
+    - paths
+    - webshell
+    - cms
+    - methods
+    - cors
+    - gambling
+    - redirect
+    - disclosure
+    - timing
+    - xss
+    - sqli
+    - crtsh
+  disabled:
+    - nikto                                  # noisy, opt-in only
+    - sqlmap-deep                            # noisy, opt-in only
+  config:
+    paths:
+      max_concurrent_probes: 20
+      include_id_gov_edu: true
+    crtsh:
+      timeout: 30s
+      cache_ttl: 24h
+    webshell:
+      paranoid: false                        # noisy probe set
+
+# ── Signature Database ──────────────────────────────────────────────
+signatures:
+  base_dir: /etc/nightcrawler/signatures
+  auto_update: false                         # opt-in
+  update_url: https://signatures.cyberoutcast.id/v7
+  verify_signature: true
+
+# ── Reporting ───────────────────────────────────────────────────────
+report:
+  locale: id                                 # id | en | auto
+  include_evidence: true
+  redact_secrets: true                       # mask token/password values
+  html:
+    theme: dark
+    print_friendly: true
+    self_contained: true
+
+# ── Notifications ───────────────────────────────────────────────────
+notify:
+  on:
+    - scan_complete
+    - severity: [critical, high]
+  channels:
+    telegram:
+      enabled: false
+      token: ${TELEGRAM_TOKEN}               # always via env
+      chat_id: "-100123456789"
+    slack:
+      enabled: false
+      webhook: ${SLACK_WEBHOOK}
+    syslog:
+      enabled: false
+      address: localhost:514
+      facility: local0
+
+# ── Telemetry ───────────────────────────────────────────────────────
+telemetry:
+  log_level: info                            # debug, info, warn, error
+  log_format: tint                           # tint | json
+  metrics:
+    enabled: false
+    bind: :9091
+  tracing:
+    enabled: false
+    otlp_endpoint: localhost:4317

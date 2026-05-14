@@ -1,0 +1,193 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Sensitive paths signature pack
+#
+#  Direct migration of the hard-coded SENSITIVE_PATHS list and the
+#  validate_path_content() case statement from v6.1 (lines 1505-1528
+#  and 447 of the legacy script). The validation rules below are the
+#  *real value* of v6.1 — five iterations of false-positive mitigation
+#  preserved as data.
+#
+#  Schema:
+#    path        — URL suffix to probe
+#    severity    — finding severity if validators pass
+#    mitigation  — mitigation ID (see mitigations.yaml)
+#    relevant_to — tech profile filter; empty = all
+#    validators  — at least ONE rule must match the response body
+#                  for the finding to be recorded
+#
+#  Each YAML entry maps to a single api.PathSignature struct loaded by
+#  the paths plugin.
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: PathSignaturePack
+metadata:
+  name: sensitive-files
+  description: Generic sensitive-file probe set
+  source: ported from nightcrawler-v6.1 lines 1505-1528 and 447
+
+paths:
+
+  # ── Generic backup & dump files ──────────────────────────────────
+  - path: "/backup.sql"
+    severity: critical
+    mitigation: REMOVE-BACKUP
+    validators:
+      - any_contains: ["CREATE TABLE", "INSERT INTO", "DROP TABLE", "-- MySQL dump"]
+
+  - path: "/backup.tar.gz"
+    severity: critical
+    mitigation: REMOVE-BACKUP
+
+  - path: "/database.sql"
+    severity: critical
+    mitigation: REMOVE-BACKUP
+    validators:
+      - any_contains: ["CREATE TABLE", "INSERT INTO"]
+
+  - path: "/dump.sql"
+    severity: critical
+    mitigation: REMOVE-BACKUP
+
+  # ── Git exposure ─────────────────────────────────────────────────
+  - path: "/.git/HEAD"
+    severity: high
+    mitigation: BLOCK-DOTGIT
+    validators:
+      - contains: "ref:"
+
+  - path: "/.git/config"
+    severity: high
+    mitigation: BLOCK-DOTGIT
+    validators:
+      - any_contains: ["[core]", "[remote", "[branch"]
+
+  - path: "/.gitignore"
+    severity: low
+    mitigation: BLOCK-DOTGIT
+
+  # ── Environment & secrets ────────────────────────────────────────
+  - path: "/.env"
+    severity: high
+    mitigation: DENY-ENV
+    validators:
+      - matches_regex: '^[A-Z_]+=.+'
+      - any_contains: ["APP_KEY", "DB_HOST", "DB_PASSWORD", "DB_NAME", "SECRET"]
+
+  - path: "/.env.production"
+    severity: critical
+    mitigation: DENY-ENV
+    validators:
+      - any_contains: ["APP_KEY", "DB_PASSWORD"]
+
+  - path: "/.env.local"
+    severity: high
+    mitigation: DENY-ENV
+    validators:
+      - any_contains: ["APP_KEY", "DB_PASSWORD"]
+
+  - path: "/config.json"
+    severity: medium
+    mitigation: REVIEW-CONFIG-EXPOSURE
+    validators:
+      - any_contains: ["password", "secret", "api_key", "token"]
+
+  # ── PHP info & debug ─────────────────────────────────────────────
+  - path: "/phpinfo.php"
+    severity: high
+    mitigation: REMOVE-PHPINFO
+    relevant_to: [php, wordpress, laravel]
+    validators:
+      - any_contains: ["PHP Version", "phpinfo()", "php_uname"]
+
+  - path: "/info.php"
+    severity: high
+    mitigation: REMOVE-PHPINFO
+    relevant_to: [php]
+    validators:
+      - any_contains: ["PHP Version", "phpinfo()"]
+
+  # ── Laravel-specific ─────────────────────────────────────────────
+  - path: "/storage/logs/laravel.log"
+    severity: high
+    mitigation: HIDE-LARAVEL-LOG
+    relevant_to: [laravel]
+    validators:
+      - matches_regex: '\[\d{4}-\d{2}-\d{2}'
+      - any_contains: ["local.ERROR", "local.INFO", "production.ERROR", "APP_ENV"]
+
+  - path: "/_ignition/health-check"
+    severity: medium
+    mitigation: DISABLE-IGNITION
+    relevant_to: [laravel]
+    validators:
+      - any_contains: ["ignition", "version"]
+
+  # ── WordPress-specific ───────────────────────────────────────────
+  - path: "/wp-config.php.bak"
+    severity: critical
+    mitigation: REMOVE-WPCONFIG-BACKUP
+    relevant_to: [wordpress]
+    validators:
+      - any_contains: ["DB_NAME", "DB_USER", "DB_PASSWORD", "AUTH_KEY"]
+
+  - path: "/wp-config.php.old"
+    severity: critical
+    mitigation: REMOVE-WPCONFIG-BACKUP
+    relevant_to: [wordpress]
+
+  - path: "/wp-config.php~"
+    severity: critical
+    mitigation: REMOVE-WPCONFIG-BACKUP
+    relevant_to: [wordpress]
+
+  # ── Spring Boot Actuator ─────────────────────────────────────────
+  - path: "/actuator"
+    severity: medium
+    mitigation: SECURE-ACTUATOR
+    relevant_to: [spring]
+    validators:
+      - any_contains: ["_links", "href"]
+
+  - path: "/actuator/env"
+    severity: high
+    mitigation: SECURE-ACTUATOR
+    relevant_to: [spring]
+    validators:
+      - any_contains: ["activeProfiles", "propertySources"]
+
+  - path: "/actuator/heapdump"
+    severity: critical
+    mitigation: SECURE-ACTUATOR
+    relevant_to: [spring]
+
+  # ── Apple Finder metadata ────────────────────────────────────────
+  - path: "/.DS_Store"
+    severity: low
+    mitigation: REMOVE-DSSTORE
+    validators:
+      - matches_regex: '^\x00\x00\x00\x01Bud1'   # binary signature
+
+  # ── IDE / editor metadata ────────────────────────────────────────
+  - path: "/.vscode/settings.json"
+    severity: low
+    mitigation: REMOVE-IDE-FILES
+  - path: "/.idea/workspace.xml"
+    severity: low
+    mitigation: REMOVE-IDE-FILES
+
+  # ── Docker / orchestration ───────────────────────────────────────
+  - path: "/docker-compose.yml"
+    severity: medium
+    mitigation: REMOVE-DEPLOY-MANIFESTS
+    validators:
+      - any_contains: ["services:", "image:", "ports:"]
+
+  - path: "/Dockerfile"
+    severity: low
+    mitigation: REMOVE-DEPLOY-MANIFESTS
+    validators:
+      - matches_regex: '^FROM '
+
+  - path: "/.dockerignore"
+    severity: info
+    mitigation: REVIEW-DEPLOY-MANIFESTS

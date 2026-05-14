@@ -1,0 +1,71 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Gambling content fingerprints
+#
+#  Keyword + density signatures used by the gambling plugin to detect
+#  injected gambling pages on compromised hosts. Direct port of the
+#  inline keyword list and density logic from v6.1 nightcrawler line
+#  1752-1757 and count_gambling_density() at line 615.
+#
+#  IMPORTANT — false-positive mitigation:
+#    - <nav>, <footer>, <header>, <script>, <style> blocks are
+#      stripped before density calculation (preserves v6.1 logic).
+#    - 'detection_threshold' is the keyword-per-1000-chars rate above
+#      which a finding is emitted. v6.1 used 5; we keep that default.
+#    - The check is INTENDED for Indonesian gov/edu hosts where any
+#      gambling content is evidence of compromise. NOT intended for
+#      gambling-themed sites generally.
+#
+#  Plugin: internal/plugins/gambling
+#  Validator helper: internal/validator/density.go
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: ContentSignaturePack
+metadata:
+  name: gambling-id
+  description: Indonesian-context gambling injection fingerprints
+  source: ported from nightcrawler-v6.1 lines 1752-1757 and 615
+
+detection_threshold: 5      # keywords per 1000 chars
+strip_tags: [nav, footer, header, script, style, aside]
+
+keywords:
+  # ── Indonesian gambling brand stems ──────────────────────────────
+  - slot
+  - slots
+  - "slot gacor"
+  - "slot online"
+  - judi
+  - "judi online"
+  - togel
+  - "togel online"
+  - sbobet
+  - poker
+  - "poker online"
+  - "casino online"
+  - "live casino"
+  - bandar
+  - bola
+  - "taruhan bola"
+  - "agen bola"
+  - sportsbook
+  - rtp
+  - jackpot
+  - "deposit pulsa"
+  - "withdraw cepat"
+  - "wd cepat"
+  # ── Common SEO-spam glue terms (used together with above) ────────
+  - gampang
+  - maxwin
+  - "hari ini"
+  - "link alternatif"
+  - "daftar slot"
+
+severity_by_density:
+  - threshold: 5
+    severity: medium
+  - threshold: 15
+    severity: high
+  - threshold: 30
+    severity: critical
+
+mitigation: REMOVE-GAMBLING-INJECTION

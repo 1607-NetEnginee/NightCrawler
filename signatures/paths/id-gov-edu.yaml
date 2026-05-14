@@ -1,0 +1,109 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Indonesian Government & Education Path Pack
+#
+#  Curated path list relevant to Indonesian government (.go.id) and
+#  education (.ac.id / .sch.id) targets. Direct port and extension of
+#  the inline list in v6.1 nightcrawler line 1505 ff., which mixed
+#  generic and ID-specific paths. This pack carries ONLY the
+#  ID-specific entries; combine with sensitive-files.yaml for full
+#  coverage.
+#
+#  Validation defaults assume PHP/Laravel/CodeIgniter backends, which
+#  are the dominant stacks in this segment.
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: PathSignaturePack
+metadata:
+  name: id-gov-edu
+  description: Indonesian government & education target path probes
+  source: HnyBadger / Cyberoutcast field knowledge
+
+paths:
+
+  # ── Sistem Informasi Pemerintah Daerah (SIPD) ────────────────────
+  - path: "/sipd"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/sipd/login"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+
+  # ── Sistem Informasi Kepegawaian (SIMPEG) ────────────────────────
+  - path: "/simpeg"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/simpeg/login"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+
+  # ── Sistem Informasi Akademik (SIAKAD) ───────────────────────────
+  - path: "/siakad"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/siakad/login"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+
+  # ── Sister, e-LHKPN, e-MonEv ─────────────────────────────────────
+  - path: "/sister"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/sakip"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/lakip"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+
+  # ── Edu-specific ─────────────────────────────────────────────────
+  - path: "/presensi"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/baak"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/pmb"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/akademik"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/dosen"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/mahasiswa"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/lms"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+  - path: "/elearning"
+    severity: info
+    mitigation: REVIEW-EXPOSED-APP
+
+  # ── Common admin entry points in this segment ────────────────────
+  - path: "/admin/login.php"
+    severity: low
+    mitigation: REVIEW-ADMIN-EXPOSURE
+  - path: "/administrator/index.php"
+    severity: low
+    mitigation: REVIEW-ADMIN-EXPOSURE
+    relevant_to: [joomla]
+  - path: "/cpanel"
+    severity: medium
+    mitigation: BLOCK-PANEL-PUBLIC
+  - path: "/phpmyadmin"
+    severity: high
+    mitigation: BLOCK-PANEL-PUBLIC
+    validators:
+      - any_contains: ["phpMyAdmin", "pma_username"]
+  - path: "/pma"
+    severity: high
+    mitigation: BLOCK-PANEL-PUBLIC
+    validators:
+      - any_contains: ["phpMyAdmin"]
+  - path: "/adminer.php"
+    severity: high
+    mitigation: BLOCK-PANEL-PUBLIC
+    validators:
+      - any_contains: ["Adminer"]

@@ -1,0 +1,41 @@
+# Aggressive profile: maximum coverage with high throughput. Designed
+# for authorized penetration tests of resilient infrastructure where
+# coverage takes priority over signal-to-noise. Will produce false
+# positives that need triage; will trigger most WAF/IDS rules.
+apiVersion: nightcrawler.io/v1
+kind: Profile
+metadata:
+  name: aggressive
+  description: "Full coverage, high throughput, all plugins including noisy ones."
+spec:
+  http:
+    rate_limit:
+      global_rps: 500
+      per_host_rps: 30
+      adaptive: true
+    stealth:
+      enabled: false
+  concurrency:
+    max_targets: auto
+    max_plugins_per_target: auto
+    max_probes_per_plugin: 40
+  plugins:
+    enabled:
+      - dns
+      - tls
+      - headers
+      - ports
+      - paths
+      - webshell
+      - cms
+      - methods
+      - cors
+      - gambling
+      - redirect
+      - disclosure
+      - timing
+      - xss
+      - sqli
+      - crtsh
+      - nikto         # explicitly enabled
+      - sqlmap-deep   # explicitly enabled

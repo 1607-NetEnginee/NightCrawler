@@ -1,0 +1,172 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — goreleaser configuration
+#  https://goreleaser.com/
+# ════════════════════════════════════════════════════════════════════
+version: 2
+
+project_name: nightcrawler
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - id: nightcrawler
+    main: ./cmd/nightcrawler
+    binary: nightcrawler
+    env:
+      - CGO_ENABLED=0
+    goos:   [linux, darwin]
+    goarch: [amd64, arm64]
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w
+      - -X github.com/HnyBadger/nightcrawler/internal/version.Version={{.Version}}
+      - -X github.com/HnyBadger/nightcrawler/internal/version.Commit={{.Commit}}
+      - -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate={{.Date}}
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - LICENSE
+      - README.md
+      - README.id.md
+      - signatures/**/*
+      - configs/nightcrawler.example.yaml
+      - configs/profiles/*
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+signs:
+  - cmd: cosign
+    artifacts: checksum
+    args:
+      - "sign-blob"
+      - "--yes"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+    output: true
+
+sboms:
+  - artifacts: archive
+    documents: ["${artifact}.sbom.spdx.json"]
+
+snapshot:
+  version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
+
+dockers:
+  - image_templates:
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
+    dockerfile: deployments/docker/Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+    goarch: amd64
+
+  - image_templates:
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+    dockerfile: deployments/docker/Dockerfile
+    use: buildx
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.version={{ .Version }}"
+      - "--label=org.opencontainers.image.revision={{ .FullCommit }}"
+      - "--label=org.opencontainers.image.created={{ .Date }}"
+    goarch: arm64
+
+docker_manifests:
+  - name_template: "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/HnyBadger/nightcrawler:latest"
+    image_templates:
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
+      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: Features
+      regexp: '^.*?feat(\(.+\))??!?:.+$'
+      order: 0
+    - title: Bug fixes
+      regexp: '^.*?fix(\(.+\))??!?:.+$'
+      order: 1
+    - title: Performance
+      regexp: '^.*?perf(\(.+\))??!?:.+$'
+      order: 2
+    - title: Security
+      regexp: '^.*?(sec|security)(\(.+\))??!?:.+$'
+      order: 3
+    - title: Other
+      order: 999
+  filters:
+    exclude:
+      - "^docs:"
+      - "^chore:"
+      - "Merge pull request"
+
+release:
+  github:
+    owner: HnyBadger
+    name: nightcrawler
+  prerelease: auto
+  draft: false
+  header: |
+    ## NIGHTCRAWLER {{ .Tag }}
+
+    Offensive Security Framework — by HnyBadger / Cyberoutcast
+
+    "ignored, but critical"
+
+    **Quickstart:**
+    ```bash
+    curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+    ```
+  footer: |
+    ## Verification
+
+    All artifacts are signed with Sigstore keyless signing:
+    ```bash
+    cosign verify-blob \
+      --certificate-identity-regexp '.*' \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+      --signature checksums.txt.sig \
+      checksums.txt
+    sha256sum -c checksums.txt
+    ```
+
+    Docker image:
+    ```bash
+    cosign verify ghcr.io/HnyBadger/nightcrawler:{{ .Tag }} \
+      --certificate-identity-regexp '.*' \
+      --certificate-oidc-issuer https://token.actions.githubusercontent.com
+    ```
+
+brews:
+  - name: nightcrawler
+    homepage: https://github.com/HnyBadger/nightcrawler
+    description: "Offensive Security Framework"
+    license: Apache-2.0
+    repository:
+      owner: HnyBadger
+      name: homebrew-tap
+    commit_author:
+      name: hnybadger-bot
+      email: bot@cyberoutcast.id
+    directory: Formula
+    test: |
+      system "#{bin}/nightcrawler", "version"

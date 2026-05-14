@@ -1,0 +1,90 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Webshell signature pack
+#
+#  Path patterns commonly used by known PHP webshells (c99, r57, wso,
+#  b374k, etc). Ported from v6.1 nightcrawler line 1616-1623 inline
+#  list. Probing these paths IS NOISY — IDS and many WAFs treat the
+#  request as evidence of compromise. The 'webshell' plugin is opt-in
+#  in the 'stealth' profile and ON by default in 'default'/'aggressive'.
+#
+#  Content validators below are designed to flag the actual shell
+#  panel content, not just a 200 response (which a soft-404 site
+#  would return for everything).
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: WebshellSignaturePack
+metadata:
+  name: webshells-builtin
+  description: Known PHP webshell path patterns and content fingerprints
+  source: ported from nightcrawler-v6.1 line 1616-1623
+
+signatures:
+
+  # ── Common shell aliases (filename-only patterns) ────────────────
+  - path: "/c99.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["c99shell", "Safe-mode", "phpinfo"]
+
+  - path: "/r57.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["r57shell", "Server IP", "uname -a"]
+
+  - path: "/wso.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["Web Shell", "wso", "PHP info"]
+
+  - path: "/b374k.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["b374k", "shell"]
+
+  - path: "/adminer.php"
+    severity: high
+    mitigation: BLOCK-ADMIN-PUBLIC
+    validators:
+      - any_contains: ["Adminer"]
+
+  - path: "/shell.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["shell", "exec", "system", "passthru"]
+
+  - path: "/cmd.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+    validators:
+      - any_contains: ["cmd", "exec", "<form"]
+
+  - path: "/upload.php"
+    severity: high
+    mitigation: REVIEW-UPLOAD-ENDPOINT
+    validators:
+      - any_contains: ["<form", "enctype=\"multipart"]
+
+  - path: "/up.php"
+    severity: high
+    mitigation: REVIEW-UPLOAD-ENDPOINT
+
+  - path: "/ujian.php"
+    severity: medium
+    mitigation: REVIEW-UPLOAD-ENDPOINT
+
+  - path: "/x.php"
+    severity: critical
+    mitigation: ISOLATE-COMPROMISED-HOST
+
+  - path: "/1.php"
+    severity: medium
+    mitigation: REVIEW-EXPOSED-APP
+
+  - path: "/test.php"
+    severity: low
+    mitigation: REMOVE-TEST-FILES

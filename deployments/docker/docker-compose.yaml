@@ -1,0 +1,49 @@
+# NIGHTCRAWLER v7.0 — local development stack
+#
+# Usage:
+#   make docker-build
+#   docker compose -f deployments/docker/docker-compose.yaml run --rm nightcrawler scan -t example.com
+#
+# The 'controller' and 'db' services are scaffolded for v7.1+; in v7.0
+# GA they will fail to start (no controller binary yet) and are kept
+# commented out by default.
+
+services:
+  nightcrawler:
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+    image: nightcrawler:dev
+    volumes:
+      - ../../reports:/work/reports
+      - ../../configs/nightcrawler.example.yaml:/etc/nightcrawler/config.yaml:ro
+    environment:
+      - TZ=Asia/Jakarta
+    networks: [nc-net]
+    # default command shows help; override on the CLI to run a scan
+    command: ["--help"]
+
+  # ── Reserved for v7.1+ ──────────────────────────────────────────
+  # controller:
+  #   image: ghcr.io/HnyBadger/nightcrawler-controller:latest
+  #   ports: ["8080:8080", "9090:9090"]
+  #   environment:
+  #     DATABASE_URL: postgres://nc:nc@db:5432/nc
+  #   depends_on: [db]
+  #   networks: [nc-net]
+  #
+  # db:
+  #   image: postgres:16-alpine
+  #   environment:
+  #     POSTGRES_USER: nc
+  #     POSTGRES_PASSWORD: nc
+  #     POSTGRES_DB: nc
+  #   volumes: [pgdata:/var/lib/postgresql/data]
+  #   networks: [nc-net]
+
+# volumes:
+#   pgdata:
+
+networks:
+  nc-net:
+    driver: bridge

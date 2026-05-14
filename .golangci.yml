@@ -1,0 +1,74 @@
+run:
+  timeout: 5m
+  tests: true
+  modules-download-mode: readonly
+  go: "1.22"
+
+linters:
+  disable-all: true
+  enable:
+    # ── correctness ──────────────────────────────────────────────
+    - govet                # standard go vet checks
+    - errcheck             # unchecked errors
+    - ineffassign          # ineffective assignments
+    - staticcheck          # staticcheck.io ruleset
+    - unused               # unused identifiers
+    - copyloopvar          # 1.22+ loop variable semantics
+    - gosec                # security-focused
+    - bodyclose            # http.Response.Body closed
+    - rowserrcheck         # database/sql Rows.Err
+    - sqlclosecheck        # database/sql connections closed
+    - errorlint            # error wrapping
+    - nilerr               # `return nil` when err != nil
+    - durationcheck        # multiplied durations
+    # ── style ────────────────────────────────────────────────────
+    - gofmt
+    - goimports
+    - misspell
+    - revive
+    - unconvert
+    - whitespace
+    # ── readability ──────────────────────────────────────────────
+    - gocritic
+    - gocyclo
+    - dupl
+
+linters-settings:
+  gocyclo:
+    min-complexity: 18
+  dupl:
+    threshold: 150
+  goimports:
+    local-prefixes: github.com/HnyBadger/nightcrawler
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment   # we care about readability over a few bytes
+  gosec:
+    excludes:
+      - G404  # math/rand for jitter is intentional, not crypto
+  revive:
+    rules:
+      - name: exported
+        arguments:
+          - disableStutteringCheck
+      - name: indent-error-flow
+      - name: package-comments
+      - name: var-naming
+      - name: errorf
+  misspell:
+    locale: US
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - dupl
+        - gosec
+        - errcheck
+    - path: internal/cli/
+      linters:
+        - dupl    # cobra command stubs look alike
+  max-issues-per-linter: 0
+  max-same-issues: 0

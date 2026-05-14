@@ -1,0 +1,23 @@
+# Compliance profile: focused on configuration checks relevant to
+# common standards (PCI-DSS, ISO 27001, regulator audits in ID). Skips
+# active payload probes. Emits SARIF + PDF output suitable for
+# auditor sign-off.
+apiVersion: nightcrawler.io/v1
+kind: Profile
+metadata:
+  name: compliance
+  description: "Configuration/posture checks only. SARIF + PDF output."
+spec:
+  plugins:
+    enabled:
+      - tls
+      - headers
+      - methods
+      - cors
+      - disclosure
+      - cms
+  output:
+    format: [ndjson, html, sarif, pdf]
+  report:
+    locale: id
+    include_evidence: true

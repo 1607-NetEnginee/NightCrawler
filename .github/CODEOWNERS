@@ -1,0 +1,22 @@
+# CODEOWNERS — auto-assign reviewers
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Catch-all
+*                                @HnyBadger
+
+# Core architecture changes need careful review
+/pkg/api/                        @HnyBadger
+/internal/core/                  @HnyBadger
+/internal/plugin/                @HnyBadger
+/internal/validator/             @HnyBadger
+
+# Security-sensitive areas
+/SECURITY.md                     @HnyBadger
+/.github/workflows/release.yml   @HnyBadger
+/.github/workflows/codeql.yml    @HnyBadger
+/scripts/install.sh              @HnyBadger
+/.goreleaser.yaml                @HnyBadger
+/deployments/docker/             @HnyBadger
+
+# Signature contributions can be reviewed by signature maintainers
+/signatures/                     @HnyBadger

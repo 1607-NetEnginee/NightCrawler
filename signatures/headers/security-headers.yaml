@@ -1,0 +1,57 @@
+# ════════════════════════════════════════════════════════════════════
+#  NIGHTCRAWLER v7.0 — Security headers checklist
+#
+#  Plugin: internal/plugins/headers. Each entry below is one check.
+#  A missing header (or a header with a value that fails the
+#  validation) emits a finding at the specified severity.
+# ════════════════════════════════════════════════════════════════════
+apiVersion: nightcrawler.io/v1
+kind: HeaderSignaturePack
+metadata:
+  name: security-headers-baseline
+
+checks:
+  - header: "Strict-Transport-Security"
+    required: true
+    severity: medium
+    mitigation: ADD-HSTS
+    must_match: 'max-age=\d+'
+
+  - header: "Content-Security-Policy"
+    required: true
+    severity: medium
+    mitigation: ADD-CSP
+    notes: "v6.1 flagged this at LOW; raised to MEDIUM per modern guidance."
+
+  - header: "X-Content-Type-Options"
+    required: true
+    severity: low
+    mitigation: ADD-XCTO
+    must_match: 'nosniff'
+
+  - header: "X-Frame-Options"
+    required: true
+    severity: medium
+    mitigation: ADD-XFO
+    must_match: '(DENY|SAMEORIGIN)'
+
+  - header: "Referrer-Policy"
+    required: true
+    severity: low
+    mitigation: ADD-REFERRER-POLICY
+
+  - header: "Permissions-Policy"
+    required: false
+    severity: info
+    mitigation: ADD-PERMISSIONS-POLICY
+
+  # Disclosure-style: header should NOT be present.
+  - header: "Server"
+    forbidden_if_matches: '(?i)(apache|nginx|iis)/[\d\.]+'
+    severity: low
+    mitigation: HIDE-SERVER-BANNER
+
+  - header: "X-Powered-By"
+    forbidden_if_matches: '.+'
+    severity: low
+    mitigation: HIDE-POWERED-BY

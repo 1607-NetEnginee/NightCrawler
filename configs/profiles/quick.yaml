@@ -1,0 +1,14 @@
+# Quick profile: bare-minimum smoke test. Designed for CI gates and
+# rapid sanity checks. Runs in under 60 seconds against a typical
+# single-domain target.
+apiVersion: nightcrawler.io/v1
+kind: Profile
+metadata:
+  name: quick
+  description: "DNS + TLS + Headers only. ~60s per target."
+spec:
+  plugins:
+    enabled:
+      - dns
+      - tls
+      - headers

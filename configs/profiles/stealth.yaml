@@ -1,0 +1,37 @@
+# Stealth profile: minimize observable scanner footprint at the cost
+# of completeness and speed. Designed for monitored targets where
+# triggering IDS/WAF alerts must be avoided. NOT recommended for first
+# scans of a new client; use 'default' first, then narrow to stealth
+# for follow-ups.
+apiVersion: nightcrawler.io/v1
+kind: Profile
+metadata:
+  name: stealth
+  description: "Low and slow: jittered, rate-limited, no noisy probes."
+spec:
+  http:
+    rate_limit:
+      global_rps: 30
+      per_host_rps: 3
+      adaptive: true
+    stealth:
+      enabled: true
+      jitter_min: 1.0s
+      jitter_max: 2.0s
+      rotate_user_agent: true
+      rotate_referer: true
+  plugins:
+    enabled:
+      - dns
+      - tls
+      - headers
+      - cms
+      - methods
+      - cors
+      - disclosure
+    disabled:
+      - webshell    # path probes trigger IDS
+      - sqli        # active payload
+      - xss         # active payload
+      - nikto       # extremely noisy
+      - sqlmap-deep
