@@ -16,7 +16,7 @@ kind: PathSignaturePack
 metadata:
   name: id-gov-edu
   description: Indonesian government & education target path probes
-  source: HnyBadger / Cyberoutcast field knowledge
+  source: 1607-NetEnginee / Cyberoutcast field knowledge
 
 paths:
 

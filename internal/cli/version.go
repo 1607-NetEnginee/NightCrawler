@@ -18,7 +18,7 @@ func newVersionCmd() *cobra.Command {
 					"  commit:     %s\n"+
 					"  built:      %s\n"+
 					"  go:         %s\n"+
-					"  author:     HnyBadger / Cyberoutcast\n"+
+					"  author:     1607-NetEnginee / Cyberoutcast\n"+
 					"  license:    Apache-2.0\n",
 				version.Version, version.Commit, version.BuildDate, version.GoVersion())
 			return nil

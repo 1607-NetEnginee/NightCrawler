@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ════════════════════════════════════════════════════════════════════
 #  NIGHTCRAWLER v7.0 — one-line installer
-#  Author: HnyBadger / Cyberoutcast
+#  Author: 1607-NetEnginee / Cyberoutcast
 #
 #  Usage:
-#    curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+#    curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash
 #
 #  Env vars:
 #    NC_VERSION   — pin a specific release (default: latest)
@@ -13,7 +13,7 @@
 # ════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-NC_REPO="HnyBadger/nightcrawler"
+NC_REPO="1607-NetEnginee/NightCrawler"
 NC_VERSION="${NC_VERSION:-latest}"
 NC_INSTALL_DIR="${NC_INSTALL_DIR:-/usr/local/bin}"
 NC_SKIP_VERIFY="${NC_SKIP_VERIFY:-0}"

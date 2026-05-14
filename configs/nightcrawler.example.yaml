@@ -1,14 +1,14 @@
 # ════════════════════════════════════════════════════════════════════
 #  NIGHTCRAWLER v7.0 — Example configuration
-#  Author: HnyBadger / Cyberoutcast
-#  Docs:   https://github.com/HnyBadger/nightcrawler/blob/main/docs/CONFIGURATION.md
+#  Author: 1607-NetEnginee / Cyberoutcast
+#  Docs:   https://github.com/1607-NetEnginee/NightCrawler/blob/main/docs/CONFIGURATION.md
 # ════════════════════════════════════════════════════════════════════
 apiVersion: nightcrawler.io/v1
 kind: Configuration
 
 # ── Identity ────────────────────────────────────────────────────────
 identity:
-  operator: HnyBadger
+  operator: 1607-NetEnginee
   organization: Cyberoutcast
   contact: ops@cyberoutcast.id
 

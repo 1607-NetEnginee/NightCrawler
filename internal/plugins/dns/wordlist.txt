@@ -3,7 +3,7 @@
 # government/education aliases that v6.1 only carried as path probes.
 #
 # Comments start with '#'. Empty lines ignored.
-# Updated by HnyBadger / Cyberoutcast.
+# Updated by 1607-NetEnginee / Cyberoutcast.
 
 # ── Common operations & infra ─────────────────────────────────────
 www

@@ -23,9 +23,9 @@ builds:
       - -trimpath
     ldflags:
       - -s -w
-      - -X github.com/HnyBadger/nightcrawler/internal/version.Version={{.Version}}
-      - -X github.com/HnyBadger/nightcrawler/internal/version.Commit={{.Commit}}
-      - -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate={{.Date}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version={{.Version}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit={{.Commit}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.BuildDate={{.Date}}
 
 archives:
   - format: tar.gz
@@ -64,7 +64,7 @@ snapshot:
 
 dockers:
   - image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
     dockerfile: deployments/docker/Dockerfile
     use: buildx
     build_flag_templates:
@@ -75,7 +75,7 @@ dockers:
     goarch: amd64
 
   - image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
     dockerfile: deployments/docker/Dockerfile
     use: buildx
     build_flag_templates:
@@ -86,14 +86,14 @@ dockers:
     goarch: arm64
 
 docker_manifests:
-  - name_template: "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}"
+  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}"
     image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/HnyBadger/nightcrawler:latest"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:latest"
     image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
 
 changelog:
   sort: asc
@@ -121,20 +121,20 @@ changelog:
 
 release:
   github:
-    owner: HnyBadger
+    owner: 1607-NetEnginee
     name: nightcrawler
   prerelease: auto
   draft: false
   header: |
     ## NIGHTCRAWLER {{ .Tag }}
 
-    Offensive Security Framework — by HnyBadger / Cyberoutcast
+    Offensive Security Framework — by 1607-NetEnginee / Cyberoutcast
 
     "ignored, but critical"
 
     **Quickstart:**
     ```bash
-    curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+    curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash
     ```
   footer: |
     ## Verification
@@ -151,21 +151,21 @@ release:
 
     Docker image:
     ```bash
-    cosign verify ghcr.io/HnyBadger/nightcrawler:{{ .Tag }} \
+    cosign verify ghcr.io/1607-NetEnginee/NightCrawler:{{ .Tag }} \
       --certificate-identity-regexp '.*' \
       --certificate-oidc-issuer https://token.actions.githubusercontent.com
     ```
 
 brews:
   - name: nightcrawler
-    homepage: https://github.com/HnyBadger/nightcrawler
+    homepage: https://github.com/1607-NetEnginee/NightCrawler
     description: "Offensive Security Framework"
     license: Apache-2.0
     repository:
-      owner: HnyBadger
+      owner: 1607-NetEnginee
       name: homebrew-tap
     commit_author:
-      name: hnybadger-bot
+      name: 1607-netengineee-bot
       email: bot@cyberoutcast.id
     directory: Formula
     test: |

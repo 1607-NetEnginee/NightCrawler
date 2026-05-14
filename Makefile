@@ -13,9 +13,9 @@ COMMIT     ?= $(shell git rev-parse --short HEAD 2>/dev/null || echo unknown)
 BUILD_DATE ?= $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 
 LDFLAGS := -s -w \
-  -X github.com/HnyBadger/nightcrawler/internal/version.Version=$(VERSION) \
-  -X github.com/HnyBadger/nightcrawler/internal/version.Commit=$(COMMIT) \
-  -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate=$(BUILD_DATE)
+  -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version=$(VERSION) \
+  -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit=$(COMMIT) \
+  -X github.com/1607-NetEnginee/NightCrawler/internal/version.BuildDate=$(BUILD_DATE)
 
 BIN_DIR := ./bin
 BIN     := $(BIN_DIR)/nightcrawler

@@ -25,7 +25,7 @@ services:
 
   # ── Reserved for v7.1+ ──────────────────────────────────────────
   # controller:
-  #   image: ghcr.io/HnyBadger/nightcrawler-controller:latest
+  #   image: ghcr.io/1607-NetEnginee/NightCrawler-controller:latest
   #   ports: ["8080:8080", "9090:9090"]
   #   environment:
   #     DATABASE_URL: postgres://nc:nc@db:5432/nc

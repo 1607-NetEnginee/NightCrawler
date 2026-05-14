@@ -3,7 +3,7 @@
 // to implement the Plugin interface. This is the stability surface of
 // the project: breaking changes here require a MAJOR version bump.
 //
-// Author: HnyBadger
+// Author: 1607-NetEnginee
 package api
 
 import (

@@ -1,5 +1,5 @@
 // NIGHTCRAWLER v7.0 — Offensive Security Framework
-// Author: HnyBadger / Cyberoutcast
+// Author: 1607-NetEnginee / Cyberoutcast
 // License: Apache-2.0
 //
 // Entry point for the `nightcrawler` binary. The job of main() is small:

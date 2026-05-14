@@ -79,7 +79,7 @@ func (p *Plugin) Manifest() api.Manifest {
 	return api.Manifest{
 		Name:        pluginName,
 		Version:     pluginVersion,
-		Author:      "HnyBadger",
+		Author:      "1607-NetEnginee",
 		Description: "DNS recon: A/CNAME/TXT lookups, subdomain brute-force, basic anomaly flags.",
 		Category:    api.CategoryRecon,
 		Profile:     api.ProfileDefault,

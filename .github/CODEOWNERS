@@ -2,21 +2,21 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # Catch-all
-*                                @HnyBadger
+*                                @1607-NetEnginee
 
 # Core architecture changes need careful review
-/pkg/api/                        @HnyBadger
-/internal/core/                  @HnyBadger
-/internal/plugin/                @HnyBadger
-/internal/validator/             @HnyBadger
+/pkg/api/                        @1607-NetEnginee
+/internal/core/                  @1607-NetEnginee
+/internal/plugin/                @1607-NetEnginee
+/internal/validator/             @1607-NetEnginee
 
 # Security-sensitive areas
-/SECURITY.md                     @HnyBadger
-/.github/workflows/release.yml   @HnyBadger
-/.github/workflows/codeql.yml    @HnyBadger
-/scripts/install.sh              @HnyBadger
-/.goreleaser.yaml                @HnyBadger
-/deployments/docker/             @HnyBadger
+/SECURITY.md                     @1607-NetEnginee
+/.github/workflows/release.yml   @1607-NetEnginee
+/.github/workflows/codeql.yml    @1607-NetEnginee
+/scripts/install.sh              @1607-NetEnginee
+/.goreleaser.yaml                @1607-NetEnginee
+/deployments/docker/             @1607-NetEnginee
 
 # Signature contributions can be reviewed by signature maintainers
-/signatures/                     @HnyBadger
+/signatures/                     @1607-NetEnginee

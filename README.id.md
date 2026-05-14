@@ -2,11 +2,11 @@
 
 > Offensive Security Framework — *"ignored, but critical"*
 >
-> oleh **HnyBadger** / **Cyberoutcast**
+> oleh **1607-NetEnginee** / **Cyberoutcast**
 
-[![ci](https://github.com/HnyBadger/nightcrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/HnyBadger/nightcrawler/actions/workflows/ci.yml)
-[![release](https://img.shields.io/github/v/release/HnyBadger/nightcrawler)](https://github.com/HnyBadger/nightcrawler/releases)
-[![license](https://img.shields.io/github/license/HnyBadger/nightcrawler)](LICENSE)
+[![ci](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml)
+[![release](https://img.shields.io/github/v/release/1607-NetEnginee/NightCrawler)](https://github.com/1607-NetEnginee/NightCrawler/releases)
+[![license](https://img.shields.io/github/license/1607-NetEnginee/NightCrawler)](LICENSE)
 
 NIGHTCRAWLER adalah framework offensive security yang modular dan berbasis plugin, ditulis ulang dalam Go. Ini adalah penerus produksi dari framework Bash v6.1 — re-arsitektur menyeluruh yang **mempertahankan** lima iterasi rekayasa *false-positive*, pengetahuan path pemerintah/pendidikan Indonesia, dan panduan mitigasi dwibahasa yang menjadi ciri khas v6.x, sambil **menghilangkan** mesin monolitik, sekuensial, dan boros subprocess yang membatasi versi sebelumnya.
 
@@ -33,26 +33,26 @@ Dokumen desain lengkap: [`docs/ANALYSIS_AND_REDESIGN.md`](docs/ANALYSIS_AND_REDE
 ### Installer satu baris
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash
 ```
 
 Installer memverifikasi SHA-256 checksum dan signature Sigstore dari artifact release sebelum melakukan instalasi.
 
 ### Unduh manual
 
-Ambil archive yang sesuai dari [halaman releases](https://github.com/HnyBadger/nightcrawler/releases). Binary bersifat portable — letakkan di mana saja di `$PATH`.
+Ambil archive yang sesuai dari [halaman releases](https://github.com/1607-NetEnginee/NightCrawler/releases). Binary bersifat portable — letakkan di mana saja di `$PATH`.
 
 ### Docker
 
 ```bash
-docker pull ghcr.io/hnybadger/nightcrawler:latest
-docker run --rm ghcr.io/hnybadger/nightcrawler:latest scan -t example.com
+docker pull ghcr.io/1607-netengineee/nightcrawler:latest
+docker run --rm ghcr.io/1607-netengineee/nightcrawler:latest scan -t example.com
 ```
 
 ### Build dari source
 
 ```bash
-git clone https://github.com/HnyBadger/nightcrawler
+git clone https://github.com/1607-NetEnginee/NightCrawler
 cd nightcrawler
 make build
 ./bin/nightcrawler --help
@@ -118,4 +118,4 @@ Apache 2.0. Lihat [`LICENSE`](LICENSE).
 
 ---
 
-*Dibuat dengan saksama oleh HnyBadger / Cyberoutcast. Bila NIGHTCRAWLER membantu pekerjaan Anda, beri ⭐ di repo — gratis dan membantu visibilitas project.*
+*Dibuat dengan saksama oleh 1607-NetEnginee / Cyberoutcast. Bila NIGHTCRAWLER membantu pekerjaan Anda, beri ⭐ di repo — gratis dan membantu visibilitas project.*

@@ -102,8 +102,8 @@ jobs:
         run: |
           mkdir -p dist
           go build -trimpath -ldflags "-s -w \
-            -X github.com/HnyBadger/nightcrawler/internal/version.Version=ci-${GITHUB_SHA::7} \
-            -X github.com/HnyBadger/nightcrawler/internal/version.Commit=${GITHUB_SHA::7}" \
+            -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version=ci-${GITHUB_SHA::7} \
+            -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit=${GITHUB_SHA::7}" \
             -o dist/nightcrawler-${{ matrix.goos }}-${{ matrix.goarch }} ./cmd/nightcrawler
 
       - name: Upload artifact

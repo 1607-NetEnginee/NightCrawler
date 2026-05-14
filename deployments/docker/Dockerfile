@@ -27,18 +27,18 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -trimpath -ldflags " \
         -s -w \
-        -X github.com/HnyBadger/nightcrawler/internal/version.Version=${VERSION} \
-        -X github.com/HnyBadger/nightcrawler/internal/version.Commit=${COMMIT} \
-        -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate=${BUILD_DATE}" \
+        -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version=${VERSION} \
+        -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit=${COMMIT} \
+        -X github.com/1607-NetEnginee/NightCrawler/internal/version.BuildDate=${BUILD_DATE}" \
     -o /out/nightcrawler ./cmd/nightcrawler
 
 # ───── Stage 2: distroless runtime ─────
 FROM gcr.io/distroless/static-debian12:nonroot
 
 LABEL org.opencontainers.image.title="nightcrawler"
-LABEL org.opencontainers.image.description="Offensive Security Framework — by HnyBadger / Cyberoutcast"
-LABEL org.opencontainers.image.source="https://github.com/HnyBadger/nightcrawler"
-LABEL org.opencontainers.image.documentation="https://github.com/HnyBadger/nightcrawler/blob/main/README.md"
+LABEL org.opencontainers.image.description="Offensive Security Framework — by 1607-NetEnginee / Cyberoutcast"
+LABEL org.opencontainers.image.source="https://github.com/1607-NetEnginee/NightCrawler"
+LABEL org.opencontainers.image.documentation="https://github.com/1607-NetEnginee/NightCrawler/blob/main/README.md"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.vendor="Cyberoutcast"
 

@@ -1,6 +1,6 @@
 # NIGHTCRAWLER v7.0 — Analisa Mendalam v6.1 & Cetak Biru Redesign
 
-> **Author:** HnyBadger  
+> **Author:** 1607-NetEnginee  
 > **Project:** NIGHTCRAWLER v7.0 (Cyberoutcast)  
 > **Dokumen:** Reverse Engineering Report + Migrasi Bash → Go + Arsitektur Enterprise
 
@@ -48,7 +48,7 @@ Diurut berdasarkan severity terhadap maintainability + scalability:
 
 ### 2.1 — Arsitektur Monolitik
 - **Penyebab:** Semua logic di 1 file 3.247 baris. Tidak ada separation of concerns. UI, parsing, networking, persistence, orchestration semua bercampur.
-- **Dampak:** Setiap perubahan kecil = risiko regresi tinggi. Hanya satu orang (HnyBadger sendiri) yang bisa contribute tanpa bingung.
+- **Dampak:** Setiap perubahan kecil = risiko regresi tinggi. Hanya satu orang (1607-NetEnginee sendiri) yang bisa contribute tanpa bingung.
 - **Bukti dari code:** Function `scan_dirs()` (line 1493) sekaligus melakukan: catch-all detection, tech-profile detection, path iteration, HTTP request, content validation, finding registration, file logging, gobuster shell-out. 6 responsibility dalam 1 function.
 
 ### 2.2 — Bash sebagai Bahasa Implementasi
@@ -1004,7 +1004,7 @@ kind: Plugin
 metadata:
   name: paths
   version: 1.0.0
-  author: HnyBadger
+  author: 1607-NetEnginee
 spec:
   description: |
     Sensitive file & directory discovery dengan tech-aware filtering.
@@ -1041,7 +1041,7 @@ import (
     "net/http"
     "sync"
 
-    "github.com/HnyBadger/nightcrawler/pkg/api"
+    "github.com/1607-NetEnginee/NightCrawler/pkg/api"
     "golang.org/x/sync/semaphore"
 )
 
@@ -1057,7 +1057,7 @@ func New() *Plugin { return &Plugin{} }
 
 func (p *Plugin) Manifest() api.Manifest {
     return api.Manifest{
-        Name: "paths", Version: "1.0.0", Author: "HnyBadger",
+        Name: "paths", Version: "1.0.0", Author: "1607-NetEnginee",
         Category: api.CategoryVuln, Profile: api.ProfileDefault,
         DependsOn: []string{"dns", "tech-profile", "catchall"},
     }
@@ -1129,8 +1129,8 @@ Built-in plugins di-register di package `init`:
 package registry
 
 import (
-    "github.com/HnyBadger/nightcrawler/internal/plugins/paths"
-    "github.com/HnyBadger/nightcrawler/internal/plugins/dns"
+    "github.com/1607-NetEnginee/NightCrawler/internal/plugins/paths"
+    "github.com/1607-NetEnginee/NightCrawler/internal/plugins/dns"
     // ... 15 lainnya
 )
 
@@ -1362,7 +1362,7 @@ Skala agent dengan K8s HPA atau systemd-nspawn cluster sederhana.
 │   ▓▓▓  NIGHTCRAWLER v7.0    ▓▓▓                       17:42:08          │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  TARGET   ▸ corp.example.com                                            │
-│  PROFILE  ▸ default        OPERATOR ▸ HnyBadger    CLIENT ▸ Acme Corp   │
+│  PROFILE  ▸ default        OPERATOR ▸ 1607-NetEnginee    CLIENT ▸ Acme Corp   │
 ├──────────────────┬──────────────────────────────────────────────────────┤
 │ MODULES          │  LIVE ACTIVITY                                       │
 │                  │                                                      │
@@ -1493,7 +1493,7 @@ Banner harus: sederhana, modern, clean, profesional, tidak terlalu tinggi (max 8
  ████╗  ██║██╔════╝   NIGHTCRAWLER  v7.0
  ██╔██╗ ██║██║        ─────────────────────────────────
  ██║╚██╗██║██║        Offensive Security Framework
- ██║ ╚████║╚██████╗   Author: HnyBadger · Cyberoutcast
+ ██║ ╚████║╚██████╗   Author: 1607-NetEnginee · Cyberoutcast
  ╚═╝  ╚═══╝ ╚═════╝   ignored, but critical · 2026
 ```
 
@@ -1503,7 +1503,7 @@ Inspirasi: Nuclei, Naabu — typeface lebar block char, info block di samping ka
 
 ```
  ╱╱╱  N I G H T C R A W L E R  ╱╱╱
-      v7.0 · by HnyBadger · Cyberoutcast
+      v7.0 · by 1607-NetEnginee · Cyberoutcast
 ```
 
 2 baris. Untuk environment yang sangat kecil (CI logs).
@@ -1516,7 +1516,7 @@ Inspirasi: Nuclei, Naabu — typeface lebar block char, info block di samping ka
     ▄█████████▄       version 7.0
     █▀█████▀█         ────────────────────────────
     ▀  ▀▀▀  ▀         Advanced Offensive Platform
-   ╱╲╱   ╲╱╲          HnyBadger · 2026
+   ╱╲╱   ╲╱╲          1607-NetEnginee · 2026
 ```
 
 Tetap spider-inspired tapi minimalist (vs v6.1 yang 25 baris).
@@ -1526,7 +1526,7 @@ Tetap spider-inspired tapi minimalist (vs v6.1 yang 25 baris).
 ```
  ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
  ┃   N I G H T C R A W L E R   v 7 . 0                    ┃
- ┃   Offensive Security Framework · by HnyBadger          ┃
+ ┃   Offensive Security Framework · by 1607-NetEnginee          ┃
  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 ```
 
@@ -1568,7 +1568,7 @@ Dashboard adalah **read-only operator UI** untuk:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  NIGHTCRAWLER                                            [⚙] [👤 HnyBadger] │
+│  NIGHTCRAWLER                                            [⚙] [👤 1607-NetEnginee] │
 ├────────────┬────────────────────────────────────────────────────────────────┤
 │ ▣ Dashboard│  ┌────────────┬────────────┬────────────┬────────────┐        │
 │ ◉ Scans    │  │  ACTIVE    │  TODAY     │  THIS WEEK │ ATTK SURF  │        │
@@ -1836,7 +1836,7 @@ GitHub Actions, 4 workflow:
 - Run goreleaser:
   - Cross-compile binary (amd64, arm64) untuk Linux/macOS.
   - Build multi-arch Docker image (linux/amd64, linux/arm64).
-  - Push ke `ghcr.io/HnyBadger/nightcrawler:vX.Y.Z` + `:latest`.
+  - Push ke `ghcr.io/1607-NetEnginee/NightCrawler:vX.Y.Z` + `:latest`.
   - Generate changelog dari conventional commits.
   - Sign artifact dengan cosign (keyless via OIDC).
   - Generate SBOM dengan syft.
@@ -1910,9 +1910,9 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -trimpath -ldflags " \
       -s -w \
-      -X github.com/HnyBadger/nightcrawler/internal/version.Version=${VERSION} \
-      -X github.com/HnyBadger/nightcrawler/internal/version.Commit=${COMMIT} \
-      -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate=${BUILD_DATE}" \
+      -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version=${VERSION} \
+      -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit=${COMMIT} \
+      -X github.com/1607-NetEnginee/NightCrawler/internal/version.BuildDate=${BUILD_DATE}" \
     -o /out/nightcrawler ./cmd/nightcrawler
 
 # ───── Stage 2: distroless runtime ─────
@@ -1920,7 +1920,7 @@ FROM gcr.io/distroless/static-debian12:nonroot
 
 LABEL org.opencontainers.image.title="nightcrawler"
 LABEL org.opencontainers.image.description="Offensive Security Framework"
-LABEL org.opencontainers.image.source="https://github.com/HnyBadger/nightcrawler"
+LABEL org.opencontainers.image.source="https://github.com/1607-NetEnginee/NightCrawler"
 LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 COPY --from=builder /out/nightcrawler /usr/local/bin/nightcrawler
@@ -1947,8 +1947,8 @@ Build untuk `linux/amd64` dan `linux/arm64` (Raspberry Pi, AWS Graviton, M1 serv
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   --push \
-  -t ghcr.io/HnyBadger/nightcrawler:v7.0.0 \
-  -t ghcr.io/HnyBadger/nightcrawler:latest \
+  -t ghcr.io/1607-NetEnginee/NightCrawler:v7.0.0 \
+  -t ghcr.io/1607-NetEnginee/NightCrawler:latest \
   .
 ```
 
@@ -1958,7 +1958,7 @@ docker buildx build \
 ```yaml
 services:
   nightcrawler:
-    image: ghcr.io/HnyBadger/nightcrawler:latest
+    image: ghcr.io/1607-NetEnginee/NightCrawler:latest
     volumes:
       - ./reports:/work/reports
       - ./config.yaml:/etc/nightcrawler/config.yaml:ro
@@ -1967,7 +1967,7 @@ services:
 
   # v7.1+: controller mode
   controller:
-    image: ghcr.io/HnyBadger/nightcrawler-controller:latest
+    image: ghcr.io/1607-NetEnginee/NightCrawler-controller:latest
     ports: ["8080:8080", "9090:9090"]
     environment:
       DATABASE_URL: postgres://nc:nc@db:5432/nc
@@ -2002,14 +2002,14 @@ Default TCP connect scan tidak butuh capability tambahan.
 ### 21.6 — Image Signing
 
 ```bash
-cosign sign --yes ghcr.io/HnyBadger/nightcrawler@sha256:...
+cosign sign --yes ghcr.io/1607-NetEnginee/NightCrawler@sha256:...
 ```
 
 Verifikasi:
 ```bash
 cosign verify --certificate-identity-regexp '.*' \
   --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-  ghcr.io/HnyBadger/nightcrawler:v7.0.0
+  ghcr.io/1607-NetEnginee/NightCrawler:v7.0.0
 ```
 
 ---
@@ -2036,9 +2036,9 @@ builds:
     flags: [-trimpath]
     ldflags:
       - -s -w
-      - -X github.com/HnyBadger/nightcrawler/internal/version.Version={{.Version}}
-      - -X github.com/HnyBadger/nightcrawler/internal/version.Commit={{.Commit}}
-      - -X github.com/HnyBadger/nightcrawler/internal/version.BuildDate={{.Date}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version={{.Version}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.Commit={{.Commit}}
+      - -X github.com/1607-NetEnginee/NightCrawler/internal/version.BuildDate={{.Date}}
 
 archives:
   - format: tar.gz
@@ -2063,26 +2063,26 @@ sboms:
 
 dockers:
   - image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
     dockerfile: deployments/docker/Dockerfile
     use: buildx
     build_flag_templates: [--platform=linux/amd64]
   - image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
     dockerfile: deployments/docker/Dockerfile
     use: buildx
     build_flag_templates: [--platform=linux/arm64]
     goarch: arm64
 
 docker_manifests:
-  - name_template: "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}"
+  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}"
     image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/HnyBadger/nightcrawler:latest"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/1607-NetEnginee/NightCrawler:latest"
     image_templates:
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-amd64"
-      - "ghcr.io/HnyBadger/nightcrawler:{{ .Version }}-arm64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-amd64"
+      - "ghcr.io/1607-NetEnginee/NightCrawler:{{ .Version }}-arm64"
 
 changelog:
   sort: asc
@@ -2099,17 +2099,17 @@ changelog:
 
 release:
   github:
-    owner: HnyBadger
+    owner: 1607-NetEnginee
     name: nightcrawler
   prerelease: auto
   header: |
     ## NIGHTCRAWLER {{ .Tag }}
 
-    Offensive Security Framework — by HnyBadger / Cyberoutcast
+    Offensive Security Framework — by 1607-NetEnginee / Cyberoutcast
 
     **Quickstart:**
     ```bash
-    curl -sSL https://raw.githubusercontent.com/HnyBadger/nightcrawler/main/scripts/install.sh | bash
+    curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/install.sh | bash
     ```
   footer: |
     **Verification:**
@@ -2120,11 +2120,11 @@ release:
 
 brews:
   - name: nightcrawler
-    homepage: https://github.com/HnyBadger/nightcrawler
+    homepage: https://github.com/1607-NetEnginee/NightCrawler
     description: "Offensive Security Framework"
     license: "Apache-2.0"
     repository:
-      owner: HnyBadger
+      owner: 1607-NetEnginee
       name: homebrew-tap
 ```
 
@@ -2216,7 +2216,7 @@ Custom slog handler yang strip pattern:
 
 Setiap action operator-significant (start scan, change config, install plugin) tulis ke `/var/log/nightcrawler/audit.log` (atau journald) dengan format:
 ```json
-{"ts":"...","actor":"hnybadger","action":"scan.start","target":"corp.example.com","scan_id":"s-..."}
+{"ts":"...","actor":"1607-netengineee","action":"scan.start","target":"corp.example.com","scan_id":"s-..."}
 ```
 
 Append-only, syslog-shippable, tamper-evident hash chain (P2).
@@ -2328,7 +2328,7 @@ Partitioning by month untuk retention efisien.
 
 | Skenario | Topologi | Target Pengguna |
 |---|---|---|
-| **Solo operator** | Binary di laptop / VPS | HnyBadger, freelance pentester |
+| **Solo operator** | Binary di laptop / VPS | 1607-NetEnginee, freelance pentester |
 | **Tim kecil** | Single VPS dengan docker-compose | Cyberoutcast team |
 | **Tim besar / MSSP** | Controller + 5 agents (K8s) | Enterprise SOC |
 | **Air-gapped** | Standalone offline | Government / regulated |
@@ -2344,10 +2344,10 @@ set -euo pipefail
 VERSION="${NC_VERSION:-latest}"
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m | sed 's/x86_64/amd64/; s/aarch64/arm64/')
-URL="https://github.com/HnyBadger/nightcrawler/releases/download/${VERSION}/nightcrawler_${VERSION}_${OS}_${ARCH}.tar.gz"
+URL="https://github.com/1607-NetEnginee/NightCrawler/releases/download/${VERSION}/nightcrawler_${VERSION}_${OS}_${ARCH}.tar.gz"
 
 # Verify checksum
-CHECKSUM_URL="https://github.com/HnyBadger/nightcrawler/releases/download/${VERSION}/checksums.txt"
+CHECKSUM_URL="https://github.com/1607-NetEnginee/NightCrawler/releases/download/${VERSION}/checksums.txt"
 curl -fsSL "$CHECKSUM_URL" -o checksums.txt
 curl -fsSL "$URL" -o nightcrawler.tar.gz
 grep "$(basename "$URL")" checksums.txt | sha256sum -c -
@@ -2432,7 +2432,7 @@ Update mechanism: USB drop dengan signature pack baru. Binary verifies signature
 GitHub Actions example:
 ```yaml
 - name: Run NIGHTCRAWLER
-  uses: HnyBadger/nightcrawler-action@v7
+  uses: 1607-NetEnginee/NightCrawler-action@v7
   with:
     target: ${{ secrets.STAGING_URL }}
     profile: stealth
@@ -2446,7 +2446,7 @@ GitHub Actions example:
 GitLab CI example:
 ```yaml
 nightcrawler:
-  image: ghcr.io/HnyBadger/nightcrawler:latest
+  image: ghcr.io/1607-NetEnginee/NightCrawler:latest
   script:
     - nightcrawler scan --target $TARGET --profile stealth --format sarif -o nc.sarif
   artifacts:
@@ -2462,14 +2462,14 @@ nightcrawler:
 ```yaml
 # ════════════════════════════════════════════════════════════════════
 # NIGHTCRAWLER v7.0 — Configuration
-# Docs: https://github.com/HnyBadger/nightcrawler/blob/main/docs/CONFIGURATION.md
+# Docs: https://github.com/1607-NetEnginee/NightCrawler/blob/main/docs/CONFIGURATION.md
 # ════════════════════════════════════════════════════════════════════
 apiVersion: nightcrawler.io/v1
 kind: Configuration
 
 # ── Identity ────────────────────────────────────────────────────────
 identity:
-  operator: HnyBadger
+  operator: 1607-NetEnginee
   organization: Cyberoutcast
   contact: ops@cyberoutcast.id
 
@@ -2630,7 +2630,7 @@ Validasi via JSONSchema. CLI: `nightcrawler config validate`.
 Setiap baris adalah event terpisah. Stream-friendly untuk pipe ke `jq`, `vector`, atau SIEM agent.
 
 ```jsonl
-{"schema":"nightcrawler.io/v1/scan_start","scan_id":"s-2026-05-14-1742-3a2c","timestamp":"2026-05-14T17:42:00.000Z","operator":"HnyBadger","organization":"Cyberoutcast","targets":["corp.example.com"],"plugins_enabled":["dns","tls","headers","ports","paths","webshell","cms","methods","cors","gambling","redirect","disclosure","timing","xss","sqli","crtsh"],"profile":"default","scanner_version":"7.0.0","scanner_commit":"a1b2c3d"}
+{"schema":"nightcrawler.io/v1/scan_start","scan_id":"s-2026-05-14-1742-3a2c","timestamp":"2026-05-14T17:42:00.000Z","operator":"1607-NetEnginee","organization":"Cyberoutcast","targets":["corp.example.com"],"plugins_enabled":["dns","tls","headers","ports","paths","webshell","cms","methods","cors","gambling","redirect","disclosure","timing","xss","sqli","crtsh"],"profile":"default","scanner_version":"7.0.0","scanner_commit":"a1b2c3d"}
 {"schema":"nightcrawler.io/v1/target_start","scan_id":"s-2026-05-14-1742-3a2c","target":"corp.example.com","timestamp":"2026-05-14T17:42:00.500Z"}
 {"schema":"nightcrawler.io/v1/plugin_start","scan_id":"s-2026-05-14-1742-3a2c","plugin":"dns","plugin_version":"1.0.0","target":"corp.example.com","timestamp":"2026-05-14T17:42:00.501Z"}
 {"schema":"nightcrawler.io/v1/finding","id":"f-3a2c8b1e","scan_id":"s-2026-05-14-1742-3a2c","timestamp":"2026-05-14T17:42:13.842Z","plugin":"paths","plugin_version":"1.0.0","level":"high","title":"Sensitive file accessible: /.env","resource":{"url":"https://corp.example.com/.env","method":"GET","status_code":200},"target":{"domain":"corp.example.com","ip":"203.0.113.42"},"evidence":[{"type":"response_excerpt","data":"APP_KEY=base64:****REDACTED****\nDB_HOST=10.0.0.5\n"}],"validation":{"catchall_filtered":true,"content_validated":true,"tech_filter_applied":"laravel"},"mitigation":{"id":"DENY-ENV","title_id":"Tutup akses file .env","title_en":"Block public access to .env","steps_id":["Tambahkan nginx rule: location ~ /\\.env { deny all; }"],"steps_en":["Add nginx rule: location ~ /\\.env { deny all; }"]},"references":[{"type":"cwe","id":"CWE-538","url":"https://cwe.mitre.org/data/definitions/538.html"},{"type":"owasp","id":"A05:2021","title":"Security Misconfiguration"}],"tags":["sensitive-file","credential-leak","laravel"],"risk_score":8.7}
@@ -2707,7 +2707,7 @@ Single-page, self-contained HTML (~150-300 KB termasuk embedded CSS+JS+font). St
 │    ├─ Glossary
 │    └─ Methodology disclaimer
 │
-└─ <footer>: Generated by NIGHTCRAWLER v7.0 · HnyBadger · 2026
+└─ <footer>: Generated by NIGHTCRAWLER v7.0 · 1607-NetEnginee · 2026
 ```
 
 Interaktivitas:
@@ -2727,10 +2727,10 @@ Untuk pipeline atau CI logs (no animation, structured prose). Default jika `!isa
 ```
 $ nightcrawler scan --target corp.example.com --profile default
 
-  ╱╱╱  NIGHTCRAWLER v7.0 · HnyBadger · Cyberoutcast  ╱╱╱
+  ╱╱╱  NIGHTCRAWLER v7.0 · 1607-NetEnginee · Cyberoutcast  ╱╱╱
 
   scan_id      s-2026-05-14-1742-3a2c
-  operator     HnyBadger
+  operator     1607-NetEnginee
   organization Cyberoutcast
   target       corp.example.com
   profile      default
@@ -2823,7 +2823,7 @@ Karakteristik:
 
 ### 30.3 — Governance
 
-- **Maintainer:** HnyBadger (BDFL) + 1-2 maintainer dipilih dari kontributor aktif.
+- **Maintainer:** 1607-NetEnginee (BDFL) + 1-2 maintainer dipilih dari kontributor aktif.
 - **Triage rotation:** 1 maintainer per week handle issue & PR.
 - **Decision process:**
   - Bug fix → langsung PR.
@@ -2907,5 +2907,5 @@ Langkah berikutnya: **scaffold skeleton Go project** sesuai struktur §10, denga
 
 **End of Analysis & Redesign Document**
 
-*Author: HnyBadger · Cyberoutcast · 2026*
+*Author: 1607-NetEnginee · Cyberoutcast · 2026*
 *"ignored, but critical"*

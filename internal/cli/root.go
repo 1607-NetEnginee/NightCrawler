@@ -27,7 +27,7 @@ func NewRoot() *cobra.Command {
 
 	root := &cobra.Command{
 		Use:           "nightcrawler",
-		Short:         "Offensive Security Framework — by HnyBadger / Cyberoutcast",
+		Short:         "Offensive Security Framework — by 1607-NetEnginee / Cyberoutcast",
 		Long:          longDescription,
 		Version:       version.Full(),
 		SilenceUsage:  true,
@@ -87,6 +87,6 @@ const bannerTemplate = `
  ████╗  ██║██╔════╝   NIGHTCRAWLER  v%s
  ██╔██╗ ██║██║        ─────────────────────────────────
  ██║╚██╗██║██║        Offensive Security Framework
- ██║ ╚████║╚██████╗   Author: HnyBadger · Cyberoutcast
+ ██║ ╚████║╚██████╗   Author: 1607-NetEnginee · Cyberoutcast
  ╚═╝  ╚═══╝ ╚═════╝   ignored, but critical
 `

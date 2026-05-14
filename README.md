@@ -2,7 +2,7 @@
 
 > Offensive Security Framework — *"ignored, but critical"*
 >
-> by **HnyBadger** / **Cyberoutcast**
+> by **1607-NetEnginee** / **Cyberoutcast**
 
 [![ci](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml/badge.svg)](https://github.com/1607-NetEnginee/NightCrawler/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/1607-NetEnginee/NightCrawler)](https://github.com/1607-NetEnginee/NightCrawler/releases)
@@ -62,7 +62,7 @@ docker run --rm ghcr.io/1607-netengineee/nightcrawler:latest scan -t example.com
 ### Homebrew (macOS / Linux)
 
 ```bash
-brew install hnybadger/tap/nightcrawler
+brew install 1607-netengineee/tap/nightcrawler
 ```
 
 ### Build from source
@@ -226,4 +226,4 @@ Apache 2.0. See [`LICENSE`](LICENSE).
 
 ---
 
-*Built with care by HnyBadger / Cyberoutcast. If NIGHTCRAWLER helped you, drop a star — it's free, and it helps the project's visibility.*
+*Built with care by 1607-NetEnginee / Cyberoutcast. If NIGHTCRAWLER helped you, drop a star — it's free, and it helps the project's visibility.*

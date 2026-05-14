@@ -36,7 +36,7 @@ We follow a 90-day disclosure timeline by default, with extensions possible for 
 
 In scope:
 - The NIGHTCRAWLER binary and its plugins
-- The official Docker images at `ghcr.io/hnybadger/nightcrawler:*`
+- The official Docker images at `ghcr.io/1607-netengineee/nightcrawler:*`
 - The installer script at `scripts/install.sh`
 - The signature pack distribution mechanism
 - The release-signing supply chain

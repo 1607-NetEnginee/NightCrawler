@@ -23,7 +23,7 @@ Please read this short guide before opening a PR — it saves time on both sides
 ## Development setup
 
 ```bash
-git clone https://github.com/HnyBadger/nightcrawler
+git clone https://github.com/1607-NetEnginee/NightCrawler
 cd nightcrawler
 
 # install golangci-lint (one-time)
@@ -114,7 +114,7 @@ Signature PRs do not require Go knowledge.
 ## Code style
 
 - `gofmt`-formatted (enforced by CI)
-- `goimports` group order: stdlib → external → `github.com/HnyBadger/nightcrawler/...`
+- `goimports` group order: stdlib → external → `github.com/1607-NetEnginee/NightCrawler/...`
 - Errors wrapped with `fmt.Errorf("context: %w", err)` — no naked propagation
 - Exported identifiers documented with godoc-style comments
 - Avoid `init()` for anything other than plugin registration
@@ -126,7 +126,7 @@ Signature PRs do not require Go knowledge.
 ## Questions?
 
 - General discussion: GitHub Discussions
-- Quick Q&A: `@HnyBadger` on the issue thread
+- Quick Q&A: `@1607-NetEnginee` on the issue thread
 - Security: see [SECURITY.md](SECURITY.md)
 
 Thanks again — and welcome.
