@@ -9,7 +9,7 @@ The NIGHTCRAWLER project takes security issues seriously. We appreciate responsi
 Instead, please use one of the following channels:
 
 - **GitHub Security Advisory:** open a private security advisory in this repository
-- **Email:** `security@cyberoutcast.id` — please encrypt with our PGP key (see below)
+- **Email:** `rootmask597@proton.me`
 
 ### What to include
 
@@ -53,15 +53,7 @@ Security researchers who responsibly disclose vulnerabilities will be credited (
 
 _(No entries yet — be the first.)_
 
----
 
-## PGP Key
-
-A current PGP key for `security@cyberoutcast.id` is available at:
-
-- https://keys.openpgp.org/search?q=security@cyberoutcast.id
-
-Fingerprint: _(to be added before v7.0 GA)_
 
 ---
 
