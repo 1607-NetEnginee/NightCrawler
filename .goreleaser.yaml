@@ -48,16 +48,16 @@ checksum:
 #signs:
 #  - cmd: cosign
 #    artifacts: checksum
-    args:
-      - "sign-blob"
-      - "--yes"
-      - "--output-signature=${signature}"
-      - "${artifact}"
-    output: true
-
-sboms:
-  - artifacts: archive
-    documents: ["${artifact}.sbom.spdx.json"]
+#    args:
+#      - "sign-blob"
+#      - "--yes"
+#      - "--output-signature=${signature}"
+#      - "${artifact}"
+#    output: true
+#
+#sboms:
+#  - artifacts: archive
+#    documents: ["${artifact}.sbom.spdx.json"]
 
 snapshot:
   version_template: "{{ incpatch .Version }}-snapshot-{{ .ShortCommit }}"
