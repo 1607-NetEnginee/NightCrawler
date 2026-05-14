@@ -102,7 +102,7 @@ main() {
         if command -v cosign >/dev/null 2>&1; then
             say "Verifying Sigstore signature"
             curl -fsSL -o checksums.txt.sig "${base_url}/checksums.txt.sig" \
-                || warn "no signature available"
+                || warn "no signature file — cosign verification skipped (this is expected for this release)"
             if [ -f checksums.txt.sig ]; then
                 cosign verify-blob \
                     --certificate-identity-regexp '.*' \
