@@ -156,17 +156,17 @@ release:
       --certificate-oidc-issuer https://token.actions.githubusercontent.com
     ```
 
-brews:
-  - name: nightcrawler
-    homepage: https://github.com/1607-NetEnginee/NightCrawler
-    description: "Offensive Security Framework"
-    license: Apache-2.0
-    repository:
-      owner: 1607-NetEnginee
-      name: homebrew-tap
-    commit_author:
-      name: 1607-netengineee-bot
-      email: bot@cyberoutcast.id
-    directory: Formula
-    test: |
-      system "#{bin}/nightcrawler", "version"
+#brews:
+#  - name: nightcrawler
+#    homepage: https://github.com/1607-NetEnginee/NightCrawler
+#    description: "Offensive Security Framework"
+#    license: Apache-2.0
+#    repository:
+#      owner: 1607-NetEnginee
+#      name: homebrew-tap
+#    commit_author:
+#      name: 1607-netengineee-bot
+#      email: bot@cyberoutcast.id
+#    directory: Formula
+#    test: |
+#      system "#{bin}/nightcrawler", "version"
