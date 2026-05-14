@@ -16,8 +16,8 @@ import (
 	"github.com/sourcegraph/conc/pool"
 	"golang.org/x/sync/semaphore"
 
-	"github.com/HnyBadger/nightcrawler/internal/plugin"
-	"github.com/HnyBadger/nightcrawler/pkg/api"
+	"github.com/1607-NetEnginee/NightCrawler/internal/plugin"
+	"github.com/1607-NetEnginee/NightCrawler/pkg/api"
 )
 
 // Orchestrator owns a single scan. It is constructed via

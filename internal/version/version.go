@@ -6,7 +6,7 @@ import "runtime/debug"
 
 var (
 	// Version is the semantic version of this build, e.g. "7.0.0".
-	// Set via: -X github.com/HnyBadger/nightcrawler/internal/version.Version=...
+	// Set via: -X github.com/1607-NetEnginee/NightCrawler/internal/version.Version=...
 	Version = "dev"
 
 	// Commit is the short Git SHA.

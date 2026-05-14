@@ -14,7 +14,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/HnyBadger/nightcrawler/internal/cli"
+	"github.com/1607-NetEnginee/NightCrawler/internal/cli"
 )
 
 func main() {

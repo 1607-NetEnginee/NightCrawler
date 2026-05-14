@@ -12,7 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/HnyBadger/nightcrawler/internal/version"
+	"github.com/1607-NetEnginee/NightCrawler/internal/version"
 )
 
 // NewRoot builds the root cobra command. Constructed per-call (no

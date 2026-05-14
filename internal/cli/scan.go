@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/HnyBadger/nightcrawler/internal/core"
+	"github.com/1607-NetEnginee/NightCrawler/internal/core"
 )
 
 // newScanCmd builds the `scan` subcommand. The job of this function is

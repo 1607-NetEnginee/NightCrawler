@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/HnyBadger/nightcrawler/internal/version"
+	"github.com/1607-NetEnginee/NightCrawler/internal/version"
 )
 
 func newVersionCmd() *cobra.Command {

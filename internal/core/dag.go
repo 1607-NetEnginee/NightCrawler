@@ -1,7 +1,7 @@
 package core
 
 import (
-	"github.com/HnyBadger/nightcrawler/pkg/api"
+	"github.com/1607-NetEnginee/NightCrawler/pkg/api"
 )
 
 // buildDAG performs a Kahn-style topological sort on the plugin list,

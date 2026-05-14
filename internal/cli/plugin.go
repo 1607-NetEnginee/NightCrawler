@@ -6,7 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/HnyBadger/nightcrawler/internal/plugin"
+	"github.com/1607-NetEnginee/NightCrawler/internal/plugin"
 )
 
 // newPluginCmd builds the `plugin` subcommand group: list, info,

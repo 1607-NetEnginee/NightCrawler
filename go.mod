@@ -1,4 +1,4 @@
-module github.com/HnyBadger/nightcrawler
+module github.com/1607-NetEnginee/NightCrawler
 
 go 1.22
 

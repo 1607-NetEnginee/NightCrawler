@@ -9,7 +9,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/HnyBadger/nightcrawler/pkg/api"
+	"github.com/1607-NetEnginee/NightCrawler/pkg/api"
 )
 
 // PluginRegistry is the in-process plugin catalog. Goroutine-safe so
