@@ -60,6 +60,21 @@ make build
 ---
 
 ## Mulai Cepat
+## Mode Interaktif (nightcrawler-ui)
+
+Untuk penggunaan yang dipandu, ramah pemula, dengan laporan HTML otomatis dan export PDF:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/nightcrawler-ui \
+  -o nightcrawler-ui && chmod +x nightcrawler-ui && sudo mv nightcrawler-ui /usr/local/bin/
+```
+
+Jalankan:
+```bash
+nightcrawler-ui
+```
+
+Alur: **wizard input → scan → laporan HTML interaktif → export PDF**
 
 ```bash
 # Smoke test

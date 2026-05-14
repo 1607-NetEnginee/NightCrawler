@@ -76,6 +76,21 @@ make build
 ---
 
 ## Quickstart
+## Interactive Mode (nightcrawler-ui)
+
+For guided, beginner-friendly usage with automatic HTML report and PDF export:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/1607-NetEnginee/NightCrawler/main/scripts/nightcrawler-ui \
+  -o nightcrawler-ui && chmod +x nightcrawler-ui && sudo mv nightcrawler-ui /usr/local/bin/
+```
+
+Run:
+```bash
+nightcrawler-ui
+```
+
+Flow: **input wizard → scan → interactive HTML report → export PDF**
 
 ```bash
 # Smoke test
